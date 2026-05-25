@@ -13,9 +13,9 @@ import { ScoreBadgeComponent } from '../../shared/components/score-badge/score-b
   styleUrl: './missions.component.scss'
 })
 export class MissionsComponent implements OnInit, OnDestroy {
-  missions = signal<Mission[]>([]);
-  loading  = signal(true);
-  minScore = signal(0);
+  missions  = signal<Mission[]>([]);
+  loading   = signal(true);
+  minScore  = 0; // propriété simple pour [(ngModel)] — signal() incompatible avec two-way binding
   private refreshListener = () => this.load();
 
   readonly statusLabels: Record<MissionStatus, string> = {
@@ -39,7 +39,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
 
   load() {
     this.loading.set(true);
-    this.radar.getMissions(this.minScore()).subscribe({
+    this.radar.getMissions(this.minScore).subscribe({
       next: m  => { this.missions.set(m); this.loading.set(false); },
       error: () => this.loading.set(false)
     });

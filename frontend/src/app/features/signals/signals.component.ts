@@ -13,7 +13,7 @@ import { Signal, SignalType } from '../../core/models/signal.model';
 export class SignalsComponent implements OnInit, OnDestroy {
   signals  = signal<Signal[]>([]);
   loading  = signal(true);
-  minScore = signal(0);
+  minScore = 0;
   private refreshListener = () => this.load();
 
   readonly typeLabels: Record<SignalType, string> = {
@@ -47,7 +47,7 @@ export class SignalsComponent implements OnInit, OnDestroy {
 
   load() {
     this.loading.set(true);
-    this.radar.getSignals(this.minScore()).subscribe({
+    this.radar.getSignals(this.minScore).subscribe({
       next: s  => { this.signals.set(s); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
