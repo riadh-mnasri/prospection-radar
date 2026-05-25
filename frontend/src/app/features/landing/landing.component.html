@@ -1,0 +1,405 @@
+<!-- BACKGROUND -->
+<div class="bg-layer">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid-lines"></div>
+</div>
+
+<!-- NAV -->
+<nav class="land-nav">
+  <a routerLink="/" class="nav-logo">
+    <div class="logo-mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10" stroke="url(#nl)" stroke-width="1.5"/>
+        <circle cx="12" cy="12" r="4" fill="url(#nl)"/>
+        <line x1="12" y1="2" x2="12" y2="6" stroke="url(#nl)" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="20.5" y1="6.5" x2="17.6" y2="8.1" stroke="url(#nl)" stroke-width="1.5" stroke-linecap="round"/>
+        <defs>
+          <linearGradient id="nl" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#7c3aed"/><stop offset="1" stop-color="#10b981"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <span class="logo-name">Prospection <span class="grad-text">Radar</span></span>
+  </a>
+  <div class="nav-center">
+    <a href="#features" class="nav-link">Fonctionnalités</a>
+    <a href="#how" class="nav-link">Comment ça marche</a>
+    <a href="#testimonials" class="nav-link">Témoignages</a>
+  </div>
+  <div class="nav-right">
+    <a routerLink="/login" class="btn btn-ghost btn-sm">Se connecter</a>
+    <a routerLink="/login" class="btn btn-primary btn-sm">Essai gratuit →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="live-dot"></span>
+    Alimenté par Claude AI · WeHighTech
+    <span class="eyebrow-sep">·</span>
+    <span class="eyebrow-new">Nouveau</span>
+  </div>
+
+  <h1 class="hero-h1">
+    <span class="h1-line">Trouvez vos missions</span>
+    <span class="h1-line h1-gradient">avant tout le monde.</span>
+  </h1>
+
+  <p class="hero-desc">
+    Le seul outil IA qui scanne le marché <strong>visible et caché</strong> pour les freelances Java Tech Lead —
+    scoring automatique, signaux d'opportunité, messages LinkedIn rédigés par Claude.
+  </p>
+
+  <div class="hero-ctas">
+    <a routerLink="/login" class="btn-hero-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+      Commencer gratuitement
+    </a>
+    <a routerLink="/login" class="btn-hero-ghost">
+      Voir la démo
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="hero-stats">
+    <div class="hstat">
+      <span class="hstat-val">60+</span>
+      <span class="hstat-lbl">missions / semaine</span>
+    </div>
+    <div class="hstat-div"></div>
+    <div class="hstat">
+      <span class="hstat-val">3</span>
+      <span class="hstat-lbl">sources scrapées</span>
+    </div>
+    <div class="hstat-div"></div>
+    <div class="hstat">
+      <span class="hstat-val">0–100</span>
+      <span class="hstat-lbl">score fit IA</span>
+    </div>
+    <div class="hstat-div"></div>
+    <div class="hstat">
+      <span class="hstat-val">24h</span>
+      <span class="hstat-lbl">d'avance marché</span>
+    </div>
+  </div>
+
+  <!-- App preview -->
+  <div class="app-preview">
+    <div class="preview-bar">
+      <div class="preview-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="preview-url">prospection-radar.app · dashboard</div>
+    </div>
+    <div class="preview-body">
+      <!-- Fake mission cards -->
+      <div class="fake-card fake-card-1">
+        <div class="fake-score">
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(124,58,237,.15)" stroke-width="4"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="url(#sr1)" stroke-width="4"
+              stroke-dasharray="96 113" stroke-linecap="round"
+              transform="rotate(-90 22 22)"/>
+            <defs><linearGradient id="sr1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
+          </svg>
+          <span class="fake-score-val">85</span>
+        </div>
+        <div class="fake-card-info">
+          <div class="fake-title">Tech Lead Java / Spring Boot</div>
+          <div class="fake-meta">Free-Work · Remote · 750€/j</div>
+          <div class="fake-tags">
+            <span>Java</span><span>Spring</span><span>AWS</span>
+          </div>
+        </div>
+        <div class="fake-badge-new">NEW</div>
+      </div>
+      <div class="fake-card fake-card-2">
+        <div class="fake-score">
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(124,58,237,.15)" stroke-width="4"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="url(#sr2)" stroke-width="4"
+              stroke-dasharray="73 113" stroke-linecap="round"
+              transform="rotate(-90 22 22)"/>
+            <defs><linearGradient id="sr2" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
+          </svg>
+          <span class="fake-score-val">65</span>
+        </div>
+        <div class="fake-card-info">
+          <div class="fake-title">Architecte Microservices</div>
+          <div class="fake-meta">Hellowork · Paris · 800€/j</div>
+          <div class="fake-tags">
+            <span>Microservices</span><span>K8s</span>
+          </div>
+        </div>
+      </div>
+      <div class="fake-card fake-card-3">
+        <div class="fake-score">
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="18" fill="none" stroke="rgba(124,58,237,.15)" stroke-width="4"/>
+            <circle cx="22" cy="22" r="18" fill="none" stroke="url(#sr3)" stroke-width="4"
+              stroke-dasharray="102 113" stroke-linecap="round"
+              transform="rotate(-90 22 22)"/>
+            <defs><linearGradient id="sr3" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#10b981"/></linearGradient></defs>
+          </svg>
+          <span class="fake-score-val">90</span>
+        </div>
+        <div class="fake-card-info">
+          <div class="fake-title">Lead Dev Java Senior</div>
+          <div class="fake-meta">LinkedIn · Full Remote · 700€/j</div>
+          <div class="fake-tags">
+            <span>Java 17</span><span>Kafka</span><span>DDD</span>
+          </div>
+        </div>
+        <div class="fake-badge-fav">★</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES BENTO -->
+<section class="features-section" id="features">
+  <div class="section-pill">Fonctionnalités</div>
+  <h2 class="section-h2">Tout ce dont vous avez besoin<br><span class="grad-text">dans un seul radar.</span></h2>
+
+  <div class="bento">
+    <!-- Large card 1 -->
+    <div class="bento-card bento-lg bento-purple">
+      <div class="bento-icon bi-purple">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+          <line x1="12" y1="2" x2="12" y2="6"/>
+        </svg>
+      </div>
+      <h3>Radar multi-sources</h3>
+      <p>Free-Work, Hellowork, LinkedIn — toutes les missions Java Tech Lead agrégées et dé-dupliquées automatiquement, en temps réel.</p>
+      <div class="bento-visual bv-radar">
+        <div class="bv-ring r1"></div>
+        <div class="bv-ring r2"></div>
+        <div class="bv-ring r3"></div>
+        <div class="bv-sweep"></div>
+        <div class="bv-dot d1"></div>
+        <div class="bv-dot d2"></div>
+        <div class="bv-dot d3"></div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="bento-card bento-emerald">
+      <div class="bento-icon bi-emerald">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2a4 4 0 0 1 4 4v2h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2V6a4 4 0 0 1 4-4z"/>
+          <circle cx="12" cy="14" r="2"/>
+        </svg>
+      </div>
+      <h3>Score IA 0–100</h3>
+      <p>Claude analyse chaque mission selon votre profil exact — compétences, TJM, remote — et génère un score de fit précis.</p>
+      <div class="bento-score-demo">
+        <div class="bsd-item">
+          <div class="bsd-bar" style="width:85%; background: linear-gradient(90deg, #7c3aed, #10b981)"></div>
+          <span>85</span>
+        </div>
+        <div class="bsd-item">
+          <div class="bsd-bar" style="width:72%"></div>
+          <span>72</span>
+        </div>
+        <div class="bsd-item">
+          <div class="bsd-bar" style="width:91%; background: linear-gradient(90deg, #7c3aed, #10b981)"></div>
+          <span>91</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="bento-card bento-amber">
+      <div class="bento-icon bi-amber">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <h3>Marché caché</h3>
+      <p>Levées de fonds, nominations CTO, recrutements massifs — détectez les signaux avant la publication des offres.</p>
+    </div>
+
+    <!-- Large card 2 -->
+    <div class="bento-card bento-lg bento-blue">
+      <div class="bento-icon bi-blue">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <h3>Messages LinkedIn & Email générés par Claude</h3>
+      <p>En un clic, Claude rédige un message personnalisé adapté à la mission, au décideur identifié et à votre positionnement unique.</p>
+      <div class="bento-message-demo">
+        <div class="bmd-header">
+          <div class="bmd-avatar">RM</div>
+          <div>
+            <div class="bmd-name">Riadh MNASRI</div>
+            <div class="bmd-role">Tech Lead Java · WeHighTech</div>
+          </div>
+        </div>
+        <div class="bmd-text">
+          Bonjour [Prénom], j'ai vu votre recherche de Tech Lead Java chez [Entreprise]. Mon expérience en architecture microservices (Spring Boot, Kafka, AWS) et mon TJM de 750€/j correspondent exactement à votre besoin...
+        </div>
+        <div class="bmd-tag">✨ Généré par Claude AI</div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="bento-card bento-glass">
+      <div class="bento-icon bi-purple">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <h3>Favoris & pipeline</h3>
+      <p>Étoilez les meilleures missions, suivez votre pipeline de prospection depuis un tableau de bord dédié.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-pill">Workflow</div>
+  <h2 class="section-h2">Opérationnel en <span class="grad-text">3 minutes.</span></h2>
+
+  <div class="timeline">
+    <div class="tl-line"></div>
+    <div class="tl-step">
+      <div class="tl-num">01</div>
+      <div class="tl-card">
+        <div class="tl-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <h3>Créez votre profil</h3>
+        <p>Renseignez vos compétences, votre TJM cible et vos préférences remote. Le radar s'adapte à vous — pas l'inverse.</p>
+      </div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">02</div>
+      <div class="tl-card">
+        <div class="tl-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/>
+            <line x1="12" y1="2" x2="12" y2="6"/>
+          </svg>
+        </div>
+        <h3>Lancez un scan</h3>
+        <p>En un clic, le radar parcourt Free-Work, Hellowork, LinkedIn et les signaux marché. Résultats scorés en quelques secondes.</p>
+      </div>
+    </div>
+    <div class="tl-step">
+      <div class="tl-num">03</div>
+      <div class="tl-card">
+        <div class="tl-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.61 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91"/>
+          </svg>
+        </div>
+        <h3>Contactez en priorité</h3>
+        <p>Triez par score IA, mettez en favoris, puis envoyez le message généré par Claude directement depuis l'interface.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials-section" id="testimonials">
+  <div class="section-pill">Témoignages</div>
+  <h2 class="section-h2">Ils l'utilisent, <span class="grad-text">ils adorent.</span></h2>
+
+  <div class="testimonials-grid">
+    <div class="testi-card testi-featured">
+      <div class="testi-quote">"</div>
+      <p>En une semaine, j'ai décroché 2 entretiens pour des missions à 750€/j — dont une que j'aurais complètement ratée sans le signal marché. Le score IA est bluffant de précision.</p>
+      <div class="testi-author">
+        <div class="testi-avatar ta-purple">AM</div>
+        <div>
+          <div class="testi-name">Alexandre M.</div>
+          <div class="testi-role">Freelance Tech Lead Java · Paris</div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p>Le message LinkedIn généré par Claude est tellement plus personnalisé que ce que j'écrivais avant. Mon taux de réponse a doublé.</p>
+      <div class="testi-author">
+        <div class="testi-avatar ta-emerald">SB</div>
+        <div>
+          <div class="testi-name">Sophie B.</div>
+          <div class="testi-role">Freelance Architecte · Lyon</div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="testi-quote">"</div>
+      <p>Fini les heures à chercher sur 5 plateformes différentes. Tout est centralisé, scoré, et prêt à contacter. Un gain de temps énorme.</p>
+      <div class="testi-author">
+        <div class="testi-avatar ta-amber">KD</div>
+        <div>
+          <div class="testi-name">Karim D.</div>
+          <div class="testi-role">Freelance Lead Dev · Remote</div>
+        </div>
+        <div class="testi-stars">★★★★★</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-orb cta-orb-1"></div>
+    <div class="cta-orb cta-orb-2"></div>
+    <div class="cta-badge">
+      <span class="live-dot"></span> Gratuit pour commencer
+    </div>
+    <h2 class="cta-h2">Prêt à trouver votre<br>prochaine mission ?</h2>
+    <p class="cta-sub">Rejoignez les freelances qui utilisent l'IA pour prospecter plus vite, mieux, et plus tôt que la concurrence.</p>
+    <a routerLink="/login" class="btn-hero-primary">
+      Commencer gratuitement — c'est gratuit
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+    <p class="cta-fine">Aucune carte bancaire requise · Configuré en 3 minutes</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="land-footer">
+  <div class="footer-top">
+    <a routerLink="/" class="nav-logo">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="10" stroke="url(#fl)" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="4" fill="url(#fl)"/>
+          <line x1="12" y1="2" x2="12" y2="6" stroke="url(#fl)" stroke-width="1.5" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="fl" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#7c3aed"/><stop offset="1" stop-color="#10b981"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="logo-name">Prospection <span class="grad-text">Radar</span></span>
+    </a>
+    <p class="footer-tagline">Le radar IA des freelances Java Tech Lead.</p>
+  </div>
+  <div class="footer-bottom">
+    <span>© {{ year }} <strong>WeHighTech</strong> · Riadh MNASRI</span>
+    <span>Propulsé par Claude AI</span>
+  </div>
+</footer>

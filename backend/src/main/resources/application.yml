@@ -64,6 +64,11 @@ radar:
     job-boards-cron: "0 0 8,12,18 * * ?"
     signals-cron: "0 30 8 * * ?"
 
+security:
+  jwt:
+    secret: ${JWT_SECRET:RadarSecretKey2026WeHighTechRiadhMnasriSuperSecretKey}
+    expiration-ms: 86400000  # 24h
+
 logging:
   level:
     com.radar: DEBUG

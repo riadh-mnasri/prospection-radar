@@ -1,0 +1,75 @@
+.auth-page {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px; position: relative; overflow: hidden;
+  background: var(--bg);
+}
+
+.auth-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; font-size: 16px; font-weight: 700;
+  color: var(--text2); margin-bottom: 40px;
+  .logo-icon {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(135deg, rgba(124,58,237,.2), rgba(16,185,129,.2));
+    border: 1px solid rgba(124,58,237,.3);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .accent {
+    background: linear-gradient(135deg, #7c3aed, #10b981);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.auth-card {
+  width: 100%; max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 20px; padding: 36px;
+  box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.03);
+  position: relative; z-index: 1;
+}
+
+.auth-header {
+  margin-bottom: 28px;
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -.02em; margin-bottom: 6px; }
+  p  { font-size: 14px; color: var(--muted); }
+}
+
+.auth-form { display: flex; flex-direction: column; gap: 18px; }
+
+.field {
+  display: flex; flex-direction: column; gap: 7px;
+  label { font-size: 12px; font-weight: 600; color: var(--text2); }
+  input {
+    padding: 11px 14px; border-radius: 10px; width: 100%; font-size: 14px;
+    &::placeholder { color: var(--muted); }
+  }
+}
+
+.auth-error {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25);
+  color: #f87171; font-size: 13px; padding: 10px 14px; border-radius: 10px;
+  svg { flex-shrink: 0; }
+}
+
+.btn-full { width: 100%; justify-content: center; padding: 12px; font-size: 14px; }
+
+.auth-footer {
+  text-align: center; margin-top: 22px;
+  font-size: 13px; color: var(--muted);
+}
+.link-btn {
+  background: none; border: none; cursor: pointer; font-family: inherit;
+  font-size: 13px; font-weight: 600; color: var(--accent-h); padding: 0 4px;
+  &:hover { text-decoration: underline; }
+}
+
+.auth-bg-glow {
+  position: absolute; width: 600px; height: 600px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,58,237,.08) 0%, transparent 70%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  pointer-events: none;
+}
