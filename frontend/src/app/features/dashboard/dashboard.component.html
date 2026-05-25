@@ -1,50 +1,189 @@
 @if (loading()) {
-  <div class="loading-wrap"><div class="spinner lg"></div></div>
+  <div class="loading-wrap">
+    <div class="spinner lg"></div>
+    <span>Chargement du radar…</span>
+  </div>
 } @else if (stats()) {
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">Missions détectées</div>
-      <div class="stat-value accent">{{ stats()!.missionsLast7Days }}</div>
-      <div class="stat-sub">sur les 7 derniers jours</div>
-      <a routerLink="/missions" class="stat-link">Voir toutes →</a>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card kpi-missions">
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-label">Missions détectées</div>
+        <div class="kpi-value">{{ stats()!.missionsLast7Days }}</div>
+        <div class="kpi-sub">7 derniers jours</div>
+      </div>
+      <a routerLink="/missions" class="kpi-link">
+        Voir toutes
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Top missions (≥ 70)</div>
-      <div class="stat-value green">{{ stats()!.topMissions }}</div>
-      <div class="stat-sub">bon fit avec ton profil</div>
-      <a routerLink="/missions" class="stat-link">Voir les tops →</a>
+
+    <div class="kpi-card kpi-top">
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-label">Top missions</div>
+        <div class="kpi-value">{{ stats()!.topMissions }}</div>
+        <div class="kpi-sub">Score ≥ 70 · bon fit</div>
+      </div>
+      <a routerLink="/missions" [queryParams]="{minScore: 70}" class="kpi-link">
+        Voir les tops
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Score fit moyen</div>
-      <div class="stat-value accent">{{ stats()!.avgFitScore || '—' }}</div>
-      <div class="stat-sub">analysé par Claude AI</div>
+
+    <div class="kpi-card kpi-score">
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-label">Score fit moyen</div>
+        <div class="kpi-value">{{ stats()!.avgFitScore || '—' }}</div>
+        <div class="kpi-sub">Analysé par Claude AI</div>
+      </div>
+      <div class="score-gauge">
+        <svg viewBox="0 0 100 50" class="gauge-svg">
+          <path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="8" stroke-linecap="round"/>
+          <path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="url(#gaugeGrad)" stroke-width="8" stroke-linecap="round"
+            [style.stroke-dasharray]="gaugeArc(stats()!.avgFitScore)"
+            stroke-dashoffset="0"/>
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ef4444"/>
+              <stop offset="50%" stop-color="#f97316"/>
+              <stop offset="100%" stop-color="#22c55e"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Signaux chauds</div>
-      <div class="stat-value warn">{{ stats()!.hotSignals }}</div>
-      <div class="stat-sub">levées de fonds, nominations</div>
-      <a routerLink="/signals" class="stat-link">Voir les signaux →</a>
+
+    <div class="kpi-card kpi-signals">
+      <div class="kpi-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div class="kpi-body">
+        <div class="kpi-label">Signaux chauds</div>
+        <div class="kpi-value">{{ stats()!.hotSignals }}</div>
+        <div class="kpi-sub">Levées, nominations</div>
+      </div>
+      <a routerLink="/signals" class="kpi-link">
+        Voir les signaux
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
   </div>
 
-  <div class="section-title">Missions par source</div>
-  <div class="sources-chart">
-    @for (entry of sourceEntries(); track entry[0]) {
-      <div class="source-row">
-        <span class="source-name">{{ entry[0] }}</span>
-        <div class="bar-wrap">
-          <div class="bar" [style.width.%]="(entry[1] / maxSourceCount()) * 100"></div>
+  <!-- Bottom row -->
+  <div class="bottom-row">
+    <!-- Sources -->
+    <div class="card sources-card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          Sources de missions
         </div>
-        <span class="source-count">{{ entry[1] }}</span>
       </div>
-    } @empty {
-      <div class="empty-chart">Aucune donnée — lance un scan ⚡</div>
-    }
+      <div class="sources-list">
+        @for (entry of sourceEntries(); track entry[0]) {
+          <div class="source-row">
+            <span class="source-label">{{ sourceLabel(entry[0]) }}</span>
+            <div class="source-bar-wrap">
+              <div class="source-bar" [style.width.%]="(entry[1] / maxSourceCount()) * 100"></div>
+            </div>
+            <span class="source-count">{{ entry[1] }}</span>
+          </div>
+        } @empty {
+          <div class="empty-sub" style="padding: 24px 0; text-align:center">Aucune donnée — lance un scan ⚡</div>
+        }
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="card actions-card">
+      <div class="card-header">
+        <div class="card-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          Actions rapides
+        </div>
+      </div>
+      <div class="actions-list">
+        <a routerLink="/missions" class="action-item">
+          <div class="action-icon purple">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="action-body">
+            <div class="action-title">Parcourir les missions</div>
+            <div class="action-desc">{{ stats()!.missionsLast7Days }} opportunités cette semaine</div>
+          </div>
+          <svg class="action-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
+        <a routerLink="/signals" class="action-item">
+          <div class="action-icon emerald">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <div class="action-body">
+            <div class="action-title">Marché caché</div>
+            <div class="action-desc">{{ stats()!.hotSignals }} signaux à exploiter</div>
+          </div>
+          <svg class="action-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+
+        <a routerLink="/missions" [queryParams]="{minScore: 70}" class="action-item">
+          <div class="action-icon amber">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div class="action-body">
+            <div class="action-title">Top missions</div>
+            <div class="action-desc">{{ stats()!.topMissions }} missions score ≥ 70</div>
+          </div>
+          <svg class="action-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
   </div>
+
 } @else {
-  <div class="empty-state">
-    <div class="empty-icon">📡</div>
-    <div class="empty-title">Radar prêt</div>
-    <div class="empty-sub">Clique sur <strong>⚡ Scanner</strong> pour démarrer la détection</div>
+  <div class="empty-state hero-empty">
+    <div class="hero-radar">
+      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="36" stroke="rgba(124,58,237,.2)" stroke-width="1.5"/>
+        <circle cx="40" cy="40" r="24" stroke="rgba(124,58,237,.3)" stroke-width="1.5"/>
+        <circle cx="40" cy="40" r="12" stroke="rgba(124,58,237,.4)" stroke-width="1.5"/>
+        <circle cx="40" cy="40" r="4" fill="#7c3aed"/>
+        <line x1="40" y1="4" x2="40" y2="76" stroke="rgba(124,58,237,.15)" stroke-width="1"/>
+        <line x1="4" y1="40" x2="76" y2="40" stroke="rgba(124,58,237,.15)" stroke-width="1"/>
+        <path d="M40 40 L68 40" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" class="radar-sweep"/>
+      </svg>
+    </div>
+    <div class="empty-title">Radar prêt au décollage</div>
+    <div class="empty-sub">Clique sur <strong>Scanner</strong> dans la barre du haut pour détecter les missions et les signaux du marché caché</div>
   </div>
 }

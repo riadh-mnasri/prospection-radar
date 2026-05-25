@@ -15,13 +15,20 @@ import { ScoreBadgeComponent } from '../../shared/components/score-badge/score-b
 export class MissionsComponent implements OnInit, OnDestroy {
   missions  = signal<Mission[]>([]);
   loading   = signal(true);
-  minScore  = 0; // propriété simple pour [(ngModel)] — signal() incompatible avec two-way binding
+  minScore  = 0;
+  expandedId: number | null = null;
   private refreshListener = () => this.load();
 
   readonly statusLabels: Record<MissionStatus, string> = {
     NEW: 'Nouveau', ANALYZED: 'Analysé', SHORTLISTED: 'Shortlisté',
     CONTACTED: 'Contacté', REPLIED: 'Répondu',
     IN_DISCUSSION: 'En discussion', ARCHIVED: 'Archivé'
+  };
+
+  readonly statusColors: Record<MissionStatus, string> = {
+    NEW: 'status-new', ANALYZED: 'status-analyzed', SHORTLISTED: 'status-shortlisted',
+    CONTACTED: 'status-contacted', REPLIED: 'status-replied',
+    IN_DISCUSSION: 'status-discussion', ARCHIVED: 'status-archived'
   };
 
   readonly statuses = Object.keys(this.statusLabels) as MissionStatus[];
@@ -45,12 +52,14 @@ export class MissionsComponent implements OnInit, OnDestroy {
     });
   }
 
+  toggle(id: number) {
+    this.expandedId = this.expandedId === id ? null : id;
+  }
+
   updateStatus(mission: Mission, status: MissionStatus) {
     this.radar.updateMissionStatus(mission.id, status).subscribe({
       next: updated => {
-        this.missions.update(list =>
-          list.map(m => m.id === updated.id ? updated : m)
-        );
+        this.missions.update(list => list.map(m => m.id === updated.id ? updated : m));
         this.toast.show('Statut mis à jour', 'success');
       },
       error: () => this.toast.show('Erreur mise à jour', 'error')
@@ -58,7 +67,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
   }
 
   formatTjm(min?: number, max?: number): string {
-    if (!min && !max) return '—';
+    if (!min && !max) return '';
     if (!max || min === max) return `${min}€/j`;
     return `${min}–${max}€/j`;
   }
@@ -73,7 +82,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
 
   sourceLabel(source: string): string {
     const map: Record<string, string> = {
-      MALT: 'Malt', FREELANCE_COM: 'Freelance.com',
+      MALT: 'Hellowork', FREELANCE_COM: 'Free-Work',
       LINKEDIN: 'LinkedIn', TALENT_IO: 'Talent.io', MANUAL: 'Manuel'
     };
     return map[source] ?? source;

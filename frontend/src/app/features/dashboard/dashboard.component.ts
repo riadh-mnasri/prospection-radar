@@ -2,7 +2,14 @@ import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { RadarService } from '../../core/services/radar.service';
 import { RadarStats } from '../../core/models/mission.model';
-import { NgIf } from '@angular/common';
+
+const SOURCE_LABELS: Record<string, string> = {
+  FREELANCE_COM: 'Free-Work',
+  MALT: 'Hellowork',
+  LINKEDIN: 'LinkedIn',
+  TALENT_IO: 'Talent.io',
+  MANUAL: 'Manuel'
+};
 
 @Component({
   selector: 'app-dashboard',
@@ -44,5 +51,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   maxSourceCount(): number {
     const entries = this.sourceEntries();
     return entries.length ? Math.max(...entries.map(e => e[1])) : 1;
+  }
+
+  sourceLabel(key: string): string {
+    return SOURCE_LABELS[key] ?? key;
+  }
+
+  gaugeArc(score: number): string {
+    const total = Math.PI * 40;
+    const fill = (score / 100) * total;
+    return `${fill} ${total}`;
   }
 }

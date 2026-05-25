@@ -1,6 +1,9 @@
-<div class="section-header">
-  <h2 class="section-title">Signaux marché caché <span class="count">{{ signals().length }}</span></h2>
-  <div class="filters">
+<div class="page-header">
+  <h1 class="page-title">
+    Signaux marché caché
+    <span class="count">{{ signals().length }}</span>
+  </h1>
+  <div class="page-controls">
     <label class="filter-label">Score min</label>
     <select [(ngModel)]="minScore" (ngModelChange)="load()" class="filter-select">
       <option [ngValue]="0">Tous</option>
@@ -12,56 +15,72 @@
 </div>
 
 @if (loading()) {
-  <div class="loading-wrap"><div class="spinner lg"></div></div>
+  <div class="loading-wrap">
+    <div class="spinner lg"></div>
+    <span>Analyse des signaux marché…</span>
+  </div>
 } @else if (signals().length === 0) {
   <div class="empty-state">
     <div class="empty-icon">📡</div>
     <div class="empty-title">Aucun signal détecté</div>
-    <div class="empty-sub">Lance un scan pour surveiller le marché caché</div>
+    <div class="empty-sub">Le radar surveille les levées de fonds, nominations CTO, recrutements massifs — lance un scan pour activer la détection</div>
   </div>
 } @else {
   <div class="signals-grid">
     @for (s of signals(); track s.id) {
-      <div class="signal-card">
-        <div class="signal-header">
-          <div>
-            <span class="badge" [class]="typeBadgeClass[s.type]">{{ typeLabels[s.type] }}</span>
-            <div class="signal-company">{{ s.company || '—' }}</div>
-          </div>
-          <div class="signal-score">
-            <div class="score-num" [style.color]="scoreColor(s.opportunityScore)">
-              {{ s.opportunityScore ?? '—' }}
-            </div>
-            <div class="score-label">score</div>
+      <div class="signal-card" [class]="'signal-card--' + s.type.toLowerCase()">
+        <div class="signal-top">
+          <span class="badge" [class]="typeBadgeClass[s.type]">{{ typeLabels[s.type] }}</span>
+          <div class="signal-score" [style.color]="scoreColor(s.opportunityScore)">
+            <span class="score-num">{{ s.opportunityScore ?? '—' }}</span>
+            <span class="score-label">/100</span>
           </div>
         </div>
 
+        <div class="signal-company">{{ s.company || '—' }}</div>
         <div class="signal-title">{{ s.title }}</div>
 
         @if (s.fundingAmount) {
-          <div class="funding-amount">💰 {{ s.fundingAmount }}</div>
+          <div class="signal-highlight funding">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            {{ s.fundingAmount }}
+          </div>
         }
         @if (s.newRole) {
-          <div class="funding-amount" style="color: var(--orange)">👤 {{ s.newRole }}</div>
+          <div class="signal-highlight role">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            {{ s.newRole }}
+          </div>
         }
 
         @if (s.opportunityReason) {
           <div class="signal-block">
-            <div class="block-label">Opportunité</div>
+            <div class="block-label">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              Opportunité
+            </div>
             <div class="block-text">{{ s.opportunityReason }}</div>
           </div>
         }
 
         @if (s.suggestedAction) {
-          <div class="signal-block action">
-            <div class="block-label">Action recommandée</div>
+          <div class="signal-block action-block">
+            <div class="block-label">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Action recommandée
+            </div>
             <div class="block-text">{{ s.suggestedAction }}</div>
           </div>
         }
 
-        @if (s.url) {
-          <a [href]="s.url" target="_blank" rel="noopener" class="signal-link">→ Voir l'article</a>
-        }
+        <div class="signal-footer">
+          @if (s.url) {
+            <a [href]="s.url" target="_blank" rel="noopener" class="signal-link">
+              Voir l'article
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          }
+        </div>
       </div>
     }
   </div>

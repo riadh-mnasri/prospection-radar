@@ -1,9 +1,12 @@
-<div class="section-header">
-  <h2 class="section-title">Missions <span class="count">{{ missions().length }}</span></h2>
-  <div class="filters">
+<div class="page-header">
+  <h1 class="page-title">
+    Missions
+    <span class="count">{{ missions().length }}</span>
+  </h1>
+  <div class="page-controls">
     <label class="filter-label">Score min</label>
     <select [(ngModel)]="minScore" (ngModelChange)="load()" class="filter-select">
-      <option [ngValue]="0">Tous</option>
+      <option [ngValue]="0">Tous les scores</option>
       <option [ngValue]="50">≥ 50</option>
       <option [ngValue]="70">≥ 70</option>
       <option [ngValue]="80">≥ 80</option>
@@ -12,74 +15,137 @@
 </div>
 
 @if (loading()) {
-  <div class="loading-wrap"><div class="spinner lg"></div></div>
+  <div class="loading-wrap">
+    <div class="spinner lg"></div>
+    <span>Chargement des missions…</span>
+  </div>
 } @else if (missions().length === 0) {
   <div class="empty-state">
     <div class="empty-icon">🎯</div>
-    <div class="empty-title">Aucune mission</div>
-    <div class="empty-sub">Lance un scan pour découvrir les opportunités</div>
+    <div class="empty-title">Aucune mission trouvée</div>
+    <div class="empty-sub">Lance un scan depuis la barre du haut pour découvrir les opportunités du marché</div>
   </div>
 } @else {
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Score</th>
-          <th>Mission</th>
-          <th>Source</th>
-          <th>TJM</th>
-          <th>Durée</th>
-          <th>Analyse Claude</th>
-          <th>Décideur</th>
-          <th>Statut</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (m of missions(); track m.id) {
-          <tr>
-            <td><app-score-badge [score]="m.fitScore" /></td>
-            <td>
+  <div class="missions-list">
+    @for (m of missions(); track m.id) {
+      <div class="mission-card" [class.expanded]="expandedId === m.id" [class.archived]="m.status === 'ARCHIVED'">
+
+        <!-- Main row -->
+        <div class="mission-main" (click)="toggle(m.id)">
+          <app-score-badge [score]="m.fitScore" />
+
+          <div class="mission-body">
+            <div class="mission-top">
               <div class="mission-title">
                 @if (m.url) {
-                  <a [href]="m.url" target="_blank" rel="noopener">{{ m.title }}</a>
+                  <a [href]="m.url" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
+                    {{ m.title }}
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  </a>
                 } @else {
                   {{ m.title }}
                 }
               </div>
-              <div class="mission-meta">
-                @if (m.company) { <span>{{ m.company }}</span> · }
-                @if (m.remote) { <span>🏠 Remote</span> }
-                @else if (m.location) { <span>📍 {{ m.location }}</span> }
-                @for (skill of m.skills?.slice(0,3); track skill) {
-                  <span class="skill-tag">{{ skill }}</span>
+              <div class="mission-badges">
+                @if (m.tjmMin || m.tjmMax) {
+                  <span class="tjm-badge">{{ formatTjm(m.tjmMin, m.tjmMax) }}</span>
                 }
+                <span class="badge" [class]="sourceBadgeClass(m.source)">{{ sourceLabel(m.source) }}</span>
               </div>
-            </td>
-            <td>
-              <span class="badge" [class]="sourceBadgeClass(m.source)">
-                {{ sourceLabel(m.source) }}
-              </span>
-            </td>
-            <td class="tjm">{{ formatTjm(m.tjmMin, m.tjmMax) }}</td>
-            <td class="duration">{{ m.duration || '—' }}</td>
-            <td>
-              <div class="fit-summary">{{ m.fitSummary || '—' }}</div>
-            </td>
-            <td>
-              <div class="decision-hint">{{ m.decisionMakerHint || '—' }}</div>
-            </td>
-            <td>
-              <select class="status-select"
-                [ngModel]="m.status"
-                (ngModelChange)="updateStatus(m, $event)">
-                @for (s of statuses; track s) {
-                  <option [value]="s">{{ statusLabels[s] }}</option>
-                }
-              </select>
-            </td>
-          </tr>
+            </div>
+
+            <div class="mission-meta">
+              @if (m.company) {
+                <span class="meta-item">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                  {{ m.company }}
+                </span>
+              }
+              @if (m.remote) {
+                <span class="meta-item remote">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                  Remote
+                </span>
+              } @else if (m.location) {
+                <span class="meta-item">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ m.location }}
+                </span>
+              }
+              @if (m.duration) {
+                <span class="meta-item">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {{ m.duration }}
+                </span>
+              }
+              @for (skill of m.skills?.slice(0, 4); track skill) {
+                <span class="skill-tag">{{ skill }}</span>
+              }
+            </div>
+
+            @if (m.fitSummary) {
+              <div class="fit-preview">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                {{ m.fitSummary }}
+              </div>
+            }
+          </div>
+
+          <div class="mission-right">
+            <select class="status-select" [class]="'status-sel ' + statusColors[m.status]"
+              [ngModel]="m.status"
+              (ngModelChange)="updateStatus(m, $event)"
+              (click)="$event.stopPropagation()">
+              @for (s of statuses; track s) {
+                <option [value]="s">{{ statusLabels[s] }}</option>
+              }
+            </select>
+            <div class="expand-icon" [class.open]="expandedId === m.id">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expanded detail -->
+        @if (expandedId === m.id) {
+          <div class="mission-detail">
+            <div class="detail-divider"></div>
+            <div class="detail-grid">
+              @if (m.fitSummary) {
+                <div class="detail-block">
+                  <div class="detail-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    Analyse fit Claude AI
+                  </div>
+                  <div class="detail-text">{{ m.fitSummary }}</div>
+                </div>
+              }
+              @if (m.decisionMakerHint) {
+                <div class="detail-block highlight">
+                  <div class="detail-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Stratégie de contact
+                  </div>
+                  <div class="detail-text">{{ m.decisionMakerHint }}</div>
+                </div>
+              }
+              @if (m.skills && m.skills.length > 4) {
+                <div class="detail-block">
+                  <div class="detail-label">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    Compétences requises
+                  </div>
+                  <div class="skills-all">
+                    @for (skill of m.skills; track skill) {
+                      <span class="skill-tag">{{ skill }}</span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         }
-      </tbody>
-    </table>
+      </div>
+    }
   </div>
 }
