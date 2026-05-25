@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: prospection-radar
+
+  datasource:
+    url: jdbc:h2:file:./data/radar;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: radar
+    password: radar
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  quartz:
+    job-store-type: memory
+    properties:
+      org.quartz.threadPool.threadCount: 3
+
+server:
+  port: 8080
+
+radar:
+  claude:
+    api-key: ${ANTHROPIC_API_KEY:your-key-here}
+    model: claude-sonnet-4-6
+    base-url: https://api.anthropic.com
+
+  profile:
+    skills:
+      - Java
+      - Spring Boot
+      - Tech Lead
+      - Architecture
+      - Microservices
+      - AWS
+      - Kubernetes
+    tjm-min: 600
+    tjm-max: 900
+    remote-preference: FULL_REMOTE
+    location: Paris
+
+  scraping:
+    delay-between-requests-ms: 2000
+    max-retries: 3
+    user-agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+    keywords:
+      - "Tech Lead Java"
+      - "Architecte Java"
+      - "Lead Developer Java"
+      - "Java Spring"
+
+  scheduling:
+    job-boards-cron: "0 0 8,12,18 * * ?"
+    signals-cron: "0 30 8 * * ?"
+
+logging:
+  level:
+    com.radar: DEBUG
+    org.springframework.web: INFO
