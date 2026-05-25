@@ -38,6 +38,12 @@ export class RadarService {
     return this.http.get<Signal[]>(`${this.api}/signals/hot`);
   }
 
+  generateOutreach(id: number): Observable<{ linkedinMessage: string; emailSubject: string; emailBody: string }> {
+    return this.http.post<{ linkedinMessage: string; emailSubject: string; emailBody: string }>(
+      `${this.api}/missions/${id}/outreach`, {}
+    );
+  }
+
   scanMissions(): Observable<ScanResult> {
     return this.http.post<ScanResult>(`${this.api}/scan/missions`, {});
   }

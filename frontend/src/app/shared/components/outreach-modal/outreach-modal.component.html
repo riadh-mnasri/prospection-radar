@@ -1,0 +1,90 @@
+<div class="modal-backdrop" (click)="onBackdrop($event)">
+  <div class="modal">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-title-block">
+        <div class="modal-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="modal-title">Message de contact</div>
+          <div class="modal-subtitle">{{ mission.company || mission.title }}</div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="close.emit()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    @if (loading()) {
+      <div class="modal-loading">
+        <div class="spinner lg"></div>
+        <span>Claude rédige votre message…</span>
+      </div>
+    } @else if (outreach()) {
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab() === 'linkedin'" (click)="setTab('linkedin')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/>
+          </svg>
+          LinkedIn
+        </button>
+        <button class="tab" [class.active]="activeTab() === 'email'" (click)="setTab('email')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+          Email
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="modal-body">
+        @if (activeTab() === 'linkedin') {
+          <div class="char-count" [class.warn]="outreach()!.linkedinMessage.length > 280">
+            {{ outreach()!.linkedinMessage.length }} / 300 caractères
+          </div>
+          <div class="message-box">{{ outreach()!.linkedinMessage }}</div>
+        } @else {
+          <div class="email-subject">
+            <span class="subject-label">Objet</span>
+            <span class="subject-text">{{ outreach()!.emailSubject }}</span>
+          </div>
+          <div class="message-box">{{ outreach()!.emailBody }}</div>
+        }
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer">
+        <div class="tip">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Personnalisez avant d'envoyer
+        </div>
+        <button class="btn btn-primary" (click)="copy()">
+          @if (copied()) {
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Copié !
+          } @else {
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copier
+          }
+        </button>
+      </div>
+    }
+  </div>
+</div>

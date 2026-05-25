@@ -4,19 +4,21 @@ import { RadarService } from '../../core/services/radar.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Mission, MissionStatus } from '../../core/models/mission.model';
 import { ScoreBadgeComponent } from '../../shared/components/score-badge/score-badge.component';
+import { OutreachModalComponent } from '../../shared/components/outreach-modal/outreach-modal.component';
 
 @Component({
   selector: 'app-missions',
   standalone: true,
-  imports: [FormsModule, ScoreBadgeComponent],
+  imports: [FormsModule, ScoreBadgeComponent, OutreachModalComponent],
   templateUrl: './missions.component.html',
   styleUrl: './missions.component.scss'
 })
 export class MissionsComponent implements OnInit, OnDestroy {
-  missions  = signal<Mission[]>([]);
-  loading   = signal(true);
-  minScore  = 0;
+  missions   = signal<Mission[]>([]);
+  loading    = signal(true);
+  minScore   = 0;
   expandedId: number | null = null;
+  outreachMission: Mission | null = null;
   private refreshListener = () => this.load();
 
   readonly statusLabels: Record<MissionStatus, string> = {
@@ -54,6 +56,26 @@ export class MissionsComponent implements OnInit, OnDestroy {
 
   toggle(id: number) {
     this.expandedId = this.expandedId === id ? null : id;
+  }
+
+  isNew(detectedAt: string): boolean {
+    return Date.now() - new Date(detectedAt).getTime() < 24 * 60 * 60 * 1000;
+  }
+
+  openOutreach(mission: Mission, event: MouseEvent) {
+    event.stopPropagation();
+    this.outreachMission = mission;
+  }
+
+  archive(mission: Mission, event: MouseEvent) {
+    event.stopPropagation();
+    this.radar.updateMissionStatus(mission.id, 'ARCHIVED').subscribe({
+      next: updated => {
+        this.missions.update(list => list.map(m => m.id === updated.id ? updated : m));
+        this.toast.show('Mission archivée', 'success');
+      },
+      error: () => this.toast.show('Erreur', 'error')
+    });
   }
 
   updateStatus(mission: Mission, status: MissionStatus) {

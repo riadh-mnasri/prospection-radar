@@ -1,6 +1,7 @@
 package com.radar.prospection.api;
 
 import com.radar.prospection.claude.MissionAnalysisService;
+import com.radar.prospection.claude.OutreachService;
 import com.radar.prospection.domain.*;
 import com.radar.prospection.repository.MissionRepository;
 import com.radar.prospection.repository.SignalRepository;
@@ -25,6 +26,7 @@ public class RadarController {
     private final ScraperCoordinator scraperCoordinator;
     private final SignalCoordinator signalCoordinator;
     private final MissionAnalysisService analysisService;
+    private final OutreachService outreachService;
 
     // ──────────────────────────────────────────
     // MISSIONS
@@ -109,6 +111,13 @@ public class RadarController {
             }
         }
         return ResponseEntity.ok(Map.of("reanalyzed", count, "total", pending.size()));
+    }
+
+    @PostMapping("/missions/{id}/outreach")
+    public ResponseEntity<OutreachDto> generateOutreach(@PathVariable Long id) {
+        return missionRepository.findById(id)
+            .map(mission -> ResponseEntity.ok(outreachService.generate(mission)))
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/scan/signals")

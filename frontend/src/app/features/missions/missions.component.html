@@ -23,7 +23,7 @@
   <div class="empty-state">
     <div class="empty-icon">🎯</div>
     <div class="empty-title">Aucune mission trouvée</div>
-    <div class="empty-sub">Lance un scan depuis la barre du haut pour découvrir les opportunités du marché</div>
+    <div class="empty-sub">Lance un scan depuis la barre du haut pour découvrir les opportunités</div>
   </div>
 } @else {
   <div class="missions-list">
@@ -32,7 +32,12 @@
 
         <!-- Main row -->
         <div class="mission-main" (click)="toggle(m.id)">
-          <app-score-badge [score]="m.fitScore" />
+          <div class="score-col">
+            <app-score-badge [score]="m.fitScore" />
+            @if (isNew(m.detectedAt)) {
+              <span class="new-badge">NEW</span>
+            }
+          </div>
 
           <div class="mission-body">
             <div class="mission-top">
@@ -84,23 +89,36 @@
             </div>
 
             @if (m.fitSummary) {
-              <div class="fit-preview">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                {{ m.fitSummary }}
-              </div>
+              <div class="fit-preview">{{ m.fitSummary }}</div>
             }
           </div>
 
-          <div class="mission-right">
+          <!-- Right actions -->
+          <div class="mission-right" (click)="$event.stopPropagation()">
             <select class="status-select" [class]="'status-sel ' + statusColors[m.status]"
               [ngModel]="m.status"
-              (ngModelChange)="updateStatus(m, $event)"
-              (click)="$event.stopPropagation()">
+              (ngModelChange)="updateStatus(m, $event)">
               @for (s of statuses; track s) {
                 <option [value]="s">{{ statusLabels[s] }}</option>
               }
             </select>
-            <div class="expand-icon" [class.open]="expandedId === m.id">
+            <div class="quick-actions">
+              <button class="quick-btn contact-btn" title="Générer message de contact" (click)="openOutreach(m, $event)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                Contacter
+              </button>
+              @if (m.status !== 'ARCHIVED') {
+                <button class="quick-btn archive-btn" title="Archiver" (click)="archive(m, $event)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/>
+                    <line x1="10" y1="12" x2="14" y2="12"/>
+                  </svg>
+                </button>
+              }
+            </div>
+            <div class="expand-icon" [class.open]="expandedId === m.id" (click)="toggle(m.id)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
             </div>
           </div>
@@ -148,4 +166,11 @@
       </div>
     }
   </div>
+}
+
+<!-- Outreach modal -->
+@if (outreachMission) {
+  <app-outreach-modal
+    [mission]="outreachMission"
+    (close)="outreachMission = null" />
 }
