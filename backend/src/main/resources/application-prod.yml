@@ -1,9 +1,10 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
-    username: ${PGUSER}
-    password: ${PGPASSWORD}
+    url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 20000
+      maximum-pool-size: 5
 
   h2:
     console:
@@ -27,3 +28,4 @@ logging:
   level:
     com.radar: INFO
     org.springframework.web: WARN
+    org.springframework.security: WARN

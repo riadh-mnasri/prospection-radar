@@ -1,6 +1,5 @@
 package com.radar.prospection.security;
 
-import com.radar.prospection.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,7 +28,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtFilter;
-    private final UserRepository userRepository;
+    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -41,6 +40,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/actuator/health").permitAll()
                 .anyRequest().authenticated()
             )
             .authenticationProvider(authProvider())
@@ -61,26 +61,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return email -> userRepository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("Utilisateur introuvable: " + email));
-    }
-
-    @Bean
     public AuthenticationProvider authProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
 
     @Bean
     public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
