@@ -32,4 +32,6 @@ public interface MissionRepository extends JpaRepository<Mission, Long> {
     long countBySourceSince(Source source, LocalDateTime since);
 
     List<Mission> findByFitScoreIsNull();
+
+    List<Mission> findByFavoriteTrueOrderByFitScoreDesc();
 }

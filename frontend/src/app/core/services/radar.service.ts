@@ -38,6 +38,14 @@ export class RadarService {
     return this.http.get<Signal[]>(`${this.api}/signals/hot`);
   }
 
+  getFavorites(): Observable<Mission[]> {
+    return this.http.get<Mission[]>(`${this.api}/missions/favorites`);
+  }
+
+  toggleFavorite(id: number, favorite: boolean): Observable<Mission> {
+    return this.http.patch<Mission>(`${this.api}/missions/${id}/favorite`, { favorite });
+  }
+
   generateOutreach(id: number): Observable<{ linkedinMessage: string; emailSubject: string; emailBody: string }> {
     return this.http.post<{ linkedinMessage: string; emailSubject: string; emailBody: string }>(
       `${this.api}/missions/${id}/outreach`, {}

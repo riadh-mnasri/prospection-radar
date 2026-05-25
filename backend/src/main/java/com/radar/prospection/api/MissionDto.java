@@ -23,7 +23,8 @@ public record MissionDto(
     Integer fitScore,
     String fitSummary,
     String decisionMakerHint,
-    LocalDateTime detectedAt
+    LocalDateTime detectedAt,
+    Boolean favorite
 ) {
     public static MissionDto from(Mission m) {
         return new MissionDto(
@@ -31,7 +32,8 @@ public record MissionDto(
             m.getLocation(), m.getRemote(), m.getTjmMin(), m.getTjmMax(),
             m.getDuration(), m.getSkills(), m.getUrl(), m.getStatus(),
             m.getFitScore(), m.getFitSummary(), m.getDecisionMakerHint(),
-            m.getDetectedAt()
+            m.getDetectedAt(),
+            Boolean.TRUE.equals(m.getFavorite())
         );
     }
 }

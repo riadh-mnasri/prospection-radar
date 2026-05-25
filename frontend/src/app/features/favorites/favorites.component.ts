@@ -7,16 +7,15 @@ import { ScoreBadgeComponent } from '../../shared/components/score-badge/score-b
 import { OutreachModalComponent } from '../../shared/components/outreach-modal/outreach-modal.component';
 
 @Component({
-  selector: 'app-missions',
+  selector: 'app-favorites',
   standalone: true,
   imports: [FormsModule, ScoreBadgeComponent, OutreachModalComponent],
-  templateUrl: './missions.component.html',
-  styleUrl: './missions.component.scss'
+  templateUrl: './favorites.component.html',
+  styleUrl: './favorites.component.scss'
 })
-export class MissionsComponent implements OnInit, OnDestroy {
-  missions   = signal<Mission[]>([]);
-  loading    = signal(true);
-  minScore   = 0;
+export class FavoritesComponent implements OnInit, OnDestroy {
+  missions      = signal<Mission[]>([]);
+  loading       = signal(true);
   expandedId: number | null = null;
   outreachMission: Mission | null = null;
   private refreshListener = () => this.load();
@@ -48,7 +47,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
 
   load() {
     this.loading.set(true);
-    this.radar.getMissions(this.minScore).subscribe({
+    this.radar.getFavorites().subscribe({
       next: m  => { this.missions.set(m); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
@@ -58,32 +57,20 @@ export class MissionsComponent implements OnInit, OnDestroy {
     this.expandedId = this.expandedId === id ? null : id;
   }
 
-  isNew(detectedAt: string): boolean {
-    return Date.now() - new Date(detectedAt).getTime() < 24 * 60 * 60 * 1000;
+  removeFavorite(mission: Mission, event: MouseEvent) {
+    event.stopPropagation();
+    this.radar.toggleFavorite(mission.id, false).subscribe({
+      next: () => {
+        this.missions.update(list => list.filter(m => m.id !== mission.id));
+        this.toast.show('Retiré des favoris', 'success');
+      },
+      error: () => this.toast.show('Erreur', 'error')
+    });
   }
 
   openOutreach(mission: Mission, event: MouseEvent) {
     event.stopPropagation();
     this.outreachMission = mission;
-  }
-
-  toggleFavorite(mission: Mission, event: MouseEvent) {
-    event.stopPropagation();
-    this.radar.toggleFavorite(mission.id, !mission.favorite).subscribe({
-      next: updated => this.missions.update(list => list.map(m => m.id === updated.id ? updated : m)),
-      error: () => this.toast.show('Erreur', 'error')
-    });
-  }
-
-  archive(mission: Mission, event: MouseEvent) {
-    event.stopPropagation();
-    this.radar.updateMissionStatus(mission.id, 'ARCHIVED').subscribe({
-      next: updated => {
-        this.missions.update(list => list.map(m => m.id === updated.id ? updated : m));
-        this.toast.show('Mission archivée', 'success');
-      },
-      error: () => this.toast.show('Erreur', 'error')
-    });
   }
 
   updateStatus(mission: Mission, status: MissionStatus) {
@@ -92,7 +79,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
         this.missions.update(list => list.map(m => m.id === updated.id ? updated : m));
         this.toast.show('Statut mis à jour', 'success');
       },
-      error: () => this.toast.show('Erreur mise à jour', 'error')
+      error: () => this.toast.show('Erreur', 'error')
     });
   }
 

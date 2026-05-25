@@ -68,4 +68,8 @@ public class Mission {
 
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
+
+    @Column(name = "favorite")
+    @Builder.Default
+    private Boolean favorite = false;
 }

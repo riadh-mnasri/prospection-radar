@@ -113,6 +113,23 @@ public class RadarController {
         return ResponseEntity.ok(Map.of("reanalyzed", count, "total", pending.size()));
     }
 
+    @GetMapping("/missions/favorites")
+    public List<MissionDto> getFavorites() {
+        return missionRepository.findByFavoriteTrueOrderByFitScoreDesc()
+                .stream().map(MissionDto::from).toList();
+    }
+
+    @PatchMapping("/missions/{id}/favorite")
+    public ResponseEntity<MissionDto> toggleFavorite(
+            @PathVariable Long id,
+            @RequestBody Map<String, Boolean> body) {
+
+        return missionRepository.findById(id).map(mission -> {
+            mission.setFavorite(body.get("favorite"));
+            return ResponseEntity.ok(MissionDto.from(missionRepository.save(mission)));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping("/missions/{id}/outreach")
     public ResponseEntity<OutreachDto> generateOutreach(@PathVariable Long id) {
         return missionRepository.findById(id)

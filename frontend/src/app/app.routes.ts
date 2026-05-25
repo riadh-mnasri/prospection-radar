@@ -13,5 +13,9 @@ export const routes: Routes = [
   {
     path: 'signals',
     loadComponent: () => import('./features/signals/signals.component').then(m => m.SignalsComponent)
+  },
+  {
+    path: 'favorites',
+    loadComponent: () => import('./features/favorites/favorites.component').then(m => m.FavoritesComponent)
   }
 ];

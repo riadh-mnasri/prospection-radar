@@ -21,6 +21,7 @@ export interface Mission {
   fitSummary?: string;
   decisionMakerHint?: string;
   detectedAt: string;
+  favorite: boolean;
 }
 
 export interface RadarStats {

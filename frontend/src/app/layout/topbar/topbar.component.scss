@@ -51,6 +51,11 @@
   }
 }
 
+.nav-fav {
+  &.active svg { color: #fcd34d; fill: #fcd34d; }
+  &:hover svg  { color: #fcd34d; }
+}
+
 .topbar-right {
   display: flex; align-items: center; gap: 8px; flex-shrink: 0;
 }
