@@ -3,11 +3,12 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Mission, MissionStatus, RadarStats, ScanResult, SignalScanResult } from '../models/mission.model';
 import { Signal } from '../models/signal.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class RadarService {
 
-  private readonly api = '/api/radar';
+  private readonly api = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
