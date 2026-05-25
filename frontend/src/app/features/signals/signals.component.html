@@ -1,0 +1,68 @@
+<div class="section-header">
+  <h2 class="section-title">Signaux marché caché <span class="count">{{ signals().length }}</span></h2>
+  <div class="filters">
+    <label class="filter-label">Score min</label>
+    <select [(ngModel)]="minScore" (ngModelChange)="load()" class="filter-select">
+      <option [ngValue]="0">Tous</option>
+      <option [ngValue]="50">≥ 50</option>
+      <option [ngValue]="60">≥ 60</option>
+      <option [ngValue]="80">≥ 80</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="loading-wrap"><div class="spinner lg"></div></div>
+} @else if (signals().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">📡</div>
+    <div class="empty-title">Aucun signal détecté</div>
+    <div class="empty-sub">Lance un scan pour surveiller le marché caché</div>
+  </div>
+} @else {
+  <div class="signals-grid">
+    @for (s of signals(); track s.id) {
+      <div class="signal-card">
+        <div class="signal-header">
+          <div>
+            <span class="badge" [class]="typeBadgeClass[s.type]">{{ typeLabels[s.type] }}</span>
+            <div class="signal-company">{{ s.company || '—' }}</div>
+          </div>
+          <div class="signal-score">
+            <div class="score-num" [style.color]="scoreColor(s.opportunityScore)">
+              {{ s.opportunityScore ?? '—' }}
+            </div>
+            <div class="score-label">score</div>
+          </div>
+        </div>
+
+        <div class="signal-title">{{ s.title }}</div>
+
+        @if (s.fundingAmount) {
+          <div class="funding-amount">💰 {{ s.fundingAmount }}</div>
+        }
+        @if (s.newRole) {
+          <div class="funding-amount" style="color: var(--orange)">👤 {{ s.newRole }}</div>
+        }
+
+        @if (s.opportunityReason) {
+          <div class="signal-block">
+            <div class="block-label">Opportunité</div>
+            <div class="block-text">{{ s.opportunityReason }}</div>
+          </div>
+        }
+
+        @if (s.suggestedAction) {
+          <div class="signal-block action">
+            <div class="block-label">Action recommandée</div>
+            <div class="block-text">{{ s.suggestedAction }}</div>
+          </div>
+        }
+
+        @if (s.url) {
+          <a [href]="s.url" target="_blank" rel="noopener" class="signal-link">→ Voir l'article</a>
+        }
+      </div>
+    }
+  </div>
+}

@@ -1,0 +1,85 @@
+<div class="section-header">
+  <h2 class="section-title">Missions <span class="count">{{ missions().length }}</span></h2>
+  <div class="filters">
+    <label class="filter-label">Score min</label>
+    <select [(ngModel)]="minScore" (ngModelChange)="load()" class="filter-select">
+      <option [ngValue]="0">Tous</option>
+      <option [ngValue]="50">≥ 50</option>
+      <option [ngValue]="70">≥ 70</option>
+      <option [ngValue]="80">≥ 80</option>
+    </select>
+  </div>
+</div>
+
+@if (loading()) {
+  <div class="loading-wrap"><div class="spinner lg"></div></div>
+} @else if (missions().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">🎯</div>
+    <div class="empty-title">Aucune mission</div>
+    <div class="empty-sub">Lance un scan pour découvrir les opportunités</div>
+  </div>
+} @else {
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Score</th>
+          <th>Mission</th>
+          <th>Source</th>
+          <th>TJM</th>
+          <th>Durée</th>
+          <th>Analyse Claude</th>
+          <th>Décideur</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of missions(); track m.id) {
+          <tr>
+            <td><app-score-badge [score]="m.fitScore" /></td>
+            <td>
+              <div class="mission-title">
+                @if (m.url) {
+                  <a [href]="m.url" target="_blank" rel="noopener">{{ m.title }}</a>
+                } @else {
+                  {{ m.title }}
+                }
+              </div>
+              <div class="mission-meta">
+                @if (m.company) { <span>{{ m.company }}</span> · }
+                @if (m.remote) { <span>🏠 Remote</span> }
+                @else if (m.location) { <span>📍 {{ m.location }}</span> }
+                @for (skill of m.skills?.slice(0,3); track skill) {
+                  <span class="skill-tag">{{ skill }}</span>
+                }
+              </div>
+            </td>
+            <td>
+              <span class="badge" [class]="sourceBadgeClass(m.source)">
+                {{ sourceLabel(m.source) }}
+              </span>
+            </td>
+            <td class="tjm">{{ formatTjm(m.tjmMin, m.tjmMax) }}</td>
+            <td class="duration">{{ m.duration || '—' }}</td>
+            <td>
+              <div class="fit-summary">{{ m.fitSummary || '—' }}</div>
+            </td>
+            <td>
+              <div class="decision-hint">{{ m.decisionMakerHint || '—' }}</div>
+            </td>
+            <td>
+              <select class="status-select"
+                [ngModel]="m.status"
+                (ngModelChange)="updateStatus(m, $event)">
+                @for (s of statuses; track s) {
+                  <option [value]="s">{{ statusLabels[s] }}</option>
+                }
+              </select>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}

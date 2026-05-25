@@ -1,0 +1,50 @@
+@if (loading()) {
+  <div class="loading-wrap"><div class="spinner lg"></div></div>
+} @else if (stats()) {
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Missions détectées</div>
+      <div class="stat-value accent">{{ stats()!.missionsLast7Days }}</div>
+      <div class="stat-sub">sur les 7 derniers jours</div>
+      <a routerLink="/missions" class="stat-link">Voir toutes →</a>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top missions (≥ 70)</div>
+      <div class="stat-value green">{{ stats()!.topMissions }}</div>
+      <div class="stat-sub">bon fit avec ton profil</div>
+      <a routerLink="/missions" class="stat-link">Voir les tops →</a>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Score fit moyen</div>
+      <div class="stat-value accent">{{ stats()!.avgFitScore || '—' }}</div>
+      <div class="stat-sub">analysé par Claude AI</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Signaux chauds</div>
+      <div class="stat-value warn">{{ stats()!.hotSignals }}</div>
+      <div class="stat-sub">levées de fonds, nominations</div>
+      <a routerLink="/signals" class="stat-link">Voir les signaux →</a>
+    </div>
+  </div>
+
+  <div class="section-title">Missions par source</div>
+  <div class="sources-chart">
+    @for (entry of sourceEntries(); track entry[0]) {
+      <div class="source-row">
+        <span class="source-name">{{ entry[0] }}</span>
+        <div class="bar-wrap">
+          <div class="bar" [style.width.%]="(entry[1] / maxSourceCount()) * 100"></div>
+        </div>
+        <span class="source-count">{{ entry[1] }}</span>
+      </div>
+    } @empty {
+      <div class="empty-chart">Aucune donnée — lance un scan ⚡</div>
+    }
+  </div>
+} @else {
+  <div class="empty-state">
+    <div class="empty-icon">📡</div>
+    <div class="empty-title">Radar prêt</div>
+    <div class="empty-sub">Clique sur <strong>⚡ Scanner</strong> pour démarrer la détection</div>
+  </div>
+}
