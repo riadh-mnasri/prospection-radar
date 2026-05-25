@@ -30,4 +30,6 @@ public interface MissionRepository extends JpaRepository<Mission, Long> {
 
     @Query("SELECT COUNT(m) FROM Mission m WHERE m.source = :source AND m.detectedAt >= :since")
     long countBySourceSince(Source source, LocalDateTime since);
+
+    List<Mission> findByFitScoreIsNull();
 }

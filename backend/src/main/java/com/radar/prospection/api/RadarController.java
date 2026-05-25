@@ -1,5 +1,6 @@
 package com.radar.prospection.api;
 
+import com.radar.prospection.claude.MissionAnalysisService;
 import com.radar.prospection.domain.*;
 import com.radar.prospection.repository.MissionRepository;
 import com.radar.prospection.repository.SignalRepository;
@@ -23,6 +24,7 @@ public class RadarController {
     private final SignalRepository signalRepository;
     private final ScraperCoordinator scraperCoordinator;
     private final SignalCoordinator signalCoordinator;
+    private final MissionAnalysisService analysisService;
 
     // ──────────────────────────────────────────
     // MISSIONS
@@ -92,6 +94,21 @@ public class RadarController {
             "analyzed", result.analyzed(),
             "errors", result.errors()
         ));
+    }
+
+    @PostMapping("/reanalyze")
+    public ResponseEntity<Map<String, Object>> reanalyzeMissions() {
+        List<Mission> pending = missionRepository.findByFitScoreIsNull();
+        int count = 0;
+        for (Mission m : pending) {
+            try {
+                missionRepository.save(analysisService.analyze(m));
+                count++;
+            } catch (Exception e) {
+                // continuer sur les autres si une mission échoue
+            }
+        }
+        return ResponseEntity.ok(Map.of("reanalyzed", count, "total", pending.size()));
     }
 
     @PostMapping("/scan/signals")
