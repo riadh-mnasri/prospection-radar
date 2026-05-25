@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prospection Radar</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #222636;
+      --border: #2e3348;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --danger: #ff4d6d;
+      --warn: #ffb347;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --green: #22c55e;
+      --orange: #f97316;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 32px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .logo { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+    .logo span { color: var(--accent); }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    .topbar-right { display: flex; gap: 12px; align-items: center; }
+    .last-update { font-size: 12px; color: var(--muted); }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 8px; border: none;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: all .15s;
+    }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { background: #7c75ff; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover:not(:disabled) { background: var(--border); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-success { background: var(--green); color: #fff; }
+
+    /* MAIN LAYOUT */
+    .main { padding: 28px 32px; max-width: 1400px; margin: 0 auto; }
+
+    /* STAT CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+    .stat-value { font-size: 32px; font-weight: 700; line-height: 1; }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+    .stat-accent { color: var(--accent); }
+    .stat-green { color: var(--green); }
+    .stat-warn { color: var(--warn); }
+    .stat-danger { color: var(--red); }
+
+    /* TABS */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+    .tab {
+      padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+      border-bottom: 2px solid transparent; color: var(--muted);
+      transition: all .15s; background: none; border-top: none; border-left: none; border-right: none;
+    }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* SECTION */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title { font-size: 16px; font-weight: 600; }
+    .section-filters { display: flex; gap: 8px; align-items: center; }
+
+    select {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); padding: 6px 10px; border-radius: 6px;
+      font-size: 13px; cursor: pointer;
+    }
+
+    /* MISSION TABLE */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left; padding: 10px 14px;
+      font-size: 11px; color: var(--muted); text-transform: uppercase;
+      letter-spacing: .5px; border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody td { padding: 12px 14px; vertical-align: middle; }
+
+    /* SCORE BADGE */
+    .score {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 50%;
+      font-weight: 700; font-size: 13px;
+    }
+    .score-high { background: rgba(34,197,94,.15); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+    .score-mid  { background: rgba(249,115,22,.15); color: var(--orange); border: 1px solid rgba(249,115,22,.3); }
+    .score-low  { background: rgba(239,68,68,.15); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+    .score-none { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+    /* SOURCE BADGE */
+    .badge {
+      display: inline-block; padding: 3px 8px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; white-space: nowrap;
+    }
+    .badge-malt     { background: rgba(108,99,255,.2); color: #a99dff; }
+    .badge-freelance{ background: rgba(0,212,170,.2); color: #00d4aa; }
+    .badge-linkedin { background: rgba(10,102,194,.2); color: #60a5fa; }
+    .badge-manual   { background: rgba(148,163,184,.2); color: #94a3b8; }
+
+    .badge-funding    { background: rgba(34,197,94,.2); color: var(--green); }
+    .badge-nomination { background: rgba(249,115,22,.2); color: var(--orange); }
+    .badge-signal     { background: rgba(108,99,255,.2); color: #a99dff; }
+
+    /* STATUS */
+    .status-select {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); padding: 4px 8px; border-radius: 6px;
+      font-size: 12px; cursor: pointer;
+    }
+
+    /* MISSION TITLE */
+    .mission-title { font-weight: 600; color: var(--text); max-width: 260px; }
+    .mission-title a { color: inherit; text-decoration: none; }
+    .mission-title a:hover { color: var(--accent); }
+    .mission-meta { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    /* FIT SUMMARY tooltip-like */
+    .fit-hint {
+      font-size: 12px; color: var(--muted); max-width: 280px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* TJM */
+    .tjm { font-weight: 600; color: var(--accent2); white-space: nowrap; }
+
+    /* SIGNAL CARDS */
+    .signals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 16px;
+    }
+
+    .signal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color .15s;
+    }
+    .signal-card:hover { border-color: var(--accent); }
+
+    .signal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .signal-company { font-weight: 700; font-size: 15px; }
+    .signal-score-wrap { text-align: right; }
+    .signal-score-num { font-size: 24px; font-weight: 700; }
+    .signal-score-label { font-size: 10px; color: var(--muted); }
+
+    .signal-title { font-size: 13px; color: var(--muted); margin-bottom: 10px; line-height: 1.4; }
+    .signal-action {
+      background: var(--surface2); border-radius: 8px; padding: 10px 12px;
+      font-size: 12px; line-height: 1.5; border-left: 3px solid var(--accent);
+    }
+    .signal-action-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center; padding: 60px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-text { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+    .empty-sub { font-size: 13px; }
+
+    /* LOADING */
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TOAST */
+    .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+    .toast {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 18px;
+      font-size: 13px; min-width: 260px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.4);
+      animation: slideIn .2s ease;
+    }
+    .toast-success { border-left: 3px solid var(--green); }
+    .toast-error   { border-left: 3px solid var(--red); }
+    .toast-info    { border-left: 3px solid var(--accent); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+    /* SCAN OVERLAY */
+    .scan-overlay {
+      position: fixed; inset: 0; background: rgba(15,17,23,.8);
+      display: none; align-items: center; justify-content: center;
+      z-index: 200; backdrop-filter: blur(4px);
+    }
+    .scan-overlay.active { display: flex; }
+    .scan-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 40px; text-align: center; min-width: 320px;
+    }
+    .scan-box .spinner { width: 40px; height: 40px; border-width: 3px; margin-bottom: 20px; }
+    .scan-step { font-size: 14px; color: var(--muted); margin-top: 8px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .topbar, .main { padding: 12px 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="status-dot" id="statusDot"></div>
+    <div class="logo">Prospection <span>Radar</span></div>
+  </div>
+  <div class="topbar-right">
+    <span class="last-update" id="lastUpdate">Jamais scanné</span>
+    <button class="btn btn-secondary btn-sm" onclick="loadAll()">↻ Actualiser</button>
+    <button class="btn btn-primary" id="scanBtn" onclick="triggerScan()">
+      ⚡ Scanner maintenant
+    </button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Missions 7 jours</div>
+      <div class="stat-value stat-accent" id="statTotal">—</div>
+      <div class="stat-sub">toutes sources confondues</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Top missions (≥70)</div>
+      <div class="stat-value stat-green" id="statTop">—</div>
+      <div class="stat-sub">bon fit avec ton profil</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Score fit moyen</div>
+      <div class="stat-value stat-accent" id="statAvg">—</div>
+      <div class="stat-sub">analysé par Claude AI</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Signaux chauds</div>
+      <div class="stat-value stat-warn" id="statSignals">—</div>
+      <div class="stat-sub">levées, nominations CTO</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('missions', this)">🎯 Missions</button>
+    <button class="tab" onclick="showTab('signals', this)">📡 Signaux marché caché</button>
+  </div>
+
+  <!-- MISSIONS TAB -->
+  <div id="tab-missions">
+    <div class="section-header">
+      <div class="section-title" id="missionsCount">Missions</div>
+      <div class="section-filters">
+        <select id="filterScore" onchange="filterMissions()">
+          <option value="0">Tous les scores</option>
+          <option value="70" selected>Score ≥ 70</option>
+          <option value="50">Score ≥ 50</option>
+        </select>
+        <select id="filterStatus" onchange="filterMissions()">
+          <option value="">Tous les statuts</option>
+          <option value="NEW">Nouveau</option>
+          <option value="SHORTLISTED">Shortlisté</option>
+          <option value="CONTACTED">Contacté</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Score</th>
+            <th>Mission</th>
+            <th>Source</th>
+            <th>TJM</th>
+            <th>Durée</th>
+            <th>Analyse Claude</th>
+            <th>Décideur</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody id="missionsBody">
+          <tr><td colspan="8"><div class="empty"><div class="spinner"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SIGNALS TAB -->
+  <div id="tab-signals" style="display:none">
+    <div class="section-header">
+      <div class="section-title" id="signalsCount">Signaux</div>
+      <div class="section-filters">
+        <select id="filterSignalScore" onchange="filterSignals()">
+          <option value="0">Tous</option>
+          <option value="60" selected>Score ≥ 60</option>
+          <option value="80">Score ≥ 80</option>
+        </select>
+      </div>
+    </div>
+    <div class="signals-grid" id="signalsGrid">
+      <div class="empty" style="grid-column:1/-1">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SCAN OVERLAY -->
+<div class="scan-overlay" id="scanOverlay">
+  <div class="scan-box">
+    <div class="spinner"></div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:8px">Scan en cours…</div>
+    <div class="scan-step" id="scanStep">Connexion aux job boards…</div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+  const API = 'http://localhost:8080/api/radar';
+  let allMissions = [];
+  let allSignals  = [];
+
+  // ─── INIT ───────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    loadAll();
+    setInterval(loadAll, 60000); // refresh auto toutes les 60s
+  });
+
+  async function loadAll() {
+    await Promise.all([loadStats(), loadMissions(), loadSignals()]);
+    document.getElementById('lastUpdate').textContent =
+      'Mis à jour ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  // ─── STATS ──────────────────────────────────────────────
+  async function loadStats() {
+    try {
+      const s = await get('/stats');
+      document.getElementById('statTotal').textContent   = s.missionsLast7Days;
+      document.getElementById('statTop').textContent     = s.topMissions;
+      document.getElementById('statAvg').textContent     = s.avgFitScore || '—';
+      document.getElementById('statSignals').textContent = s.hotSignals;
+    } catch(e) {
+      setOffline();
+    }
+  }
+
+  // ─── MISSIONS ───────────────────────────────────────────
+  async function loadMissions() {
+    try {
+      const minScore = document.getElementById('filterScore').value;
+      allMissions = await get('/missions?minScore=' + minScore);
+      renderMissions(allMissions);
+    } catch(e) {
+      document.getElementById('missionsBody').innerHTML =
+        `<tr><td colspan="8"><div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Impossible de charger les missions</div><div class="empty-sub">${e.message}</div></div></td></tr>`;
+    }
+  }
+
+  function filterMissions() {
+    loadMissions();
+  }
+
+  function renderMissions(missions) {
+    const tbody = document.getElementById('missionsBody');
+    document.getElementById('missionsCount').textContent =
+      `Missions (${missions.length})`;
+
+    if (!missions.length) {
+      tbody.innerHTML = `
+        <tr><td colspan="8">
+          <div class="empty">
+            <div class="empty-icon">🎯</div>
+            <div class="empty-text">Aucune mission trouvée</div>
+            <div class="empty-sub">Lance un scan pour découvrir les opportunités</div>
+          </div>
+        </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = missions.map(m => `
+      <tr>
+        <td>${scoreHtml(m.fitScore)}</td>
+        <td>
+          <div class="mission-title">
+            ${m.url ? `<a href="${m.url}" target="_blank">${esc(m.title)}</a>` : esc(m.title)}
+          </div>
+          <div class="mission-meta">
+            ${m.company ? esc(m.company) + ' · ' : ''}
+            ${m.remote ? '🏠 Remote' : m.location ? '📍 ' + esc(m.location) : ''}
+            ${m.skills?.slice(0,3).map(s => `<span class="badge badge-malt" style="margin-left:4px">${esc(s)}</span>`).join('') || ''}
+          </div>
+        </td>
+        <td>${sourceBadge(m.source)}</td>
+        <td class="tjm">${formatTjm(m.tjmMin, m.tjmMax)}</td>
+        <td style="color:var(--muted);white-space:nowrap">${m.duration || '—'}</td>
+        <td><div class="fit-hint">${esc(m.fitSummary) || '<span style="color:var(--muted)">En attente</span>'}</div></td>
+        <td><div class="fit-hint" style="color:var(--accent2)">${esc(m.decisionMakerHint) || '—'}</div></td>
+        <td>
+          <select class="status-select" onchange="updateStatus(${m.id}, this.value)">
+            ${statusOptions(m.status)}
+          </select>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ─── SIGNALS ────────────────────────────────────────────
+  async function loadSignals() {
+    try {
+      const minScore = document.getElementById('filterSignalScore')?.value || 0;
+      allSignals = await get('/signals?minScore=' + minScore);
+      renderSignals(allSignals);
+    } catch(e) { /* ignore */ }
+  }
+
+  function filterSignals() {
+    loadSignals();
+  }
+
+  function renderSignals(signals) {
+    const grid = document.getElementById('signalsGrid');
+    document.getElementById('signalsCount').textContent = `Signaux (${signals.length})`;
+
+    if (!signals.length) {
+      grid.innerHTML = `
+        <div class="empty" style="grid-column:1/-1">
+          <div class="empty-icon">📡</div>
+          <div class="empty-text">Aucun signal détecté</div>
+          <div class="empty-sub">Lance un scan signaux pour surveiller le marché caché</div>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = signals.map(s => `
+      <div class="signal-card">
+        <div class="signal-header">
+          <div>
+            ${signalBadge(s.type)}
+            <div class="signal-company" style="margin-top:6px">${esc(s.company || '—')}</div>
+          </div>
+          <div class="signal-score-wrap">
+            <div class="signal-score-num" style="color:${scoreColor(s.opportunityScore)}">${s.opportunityScore ?? '—'}</div>
+            <div class="signal-score-label">score</div>
+          </div>
+        </div>
+        <div class="signal-title">${esc(s.title)}</div>
+        ${s.fundingAmount ? `<div style="font-size:12px;color:var(--green);margin-bottom:8px">💰 ${esc(s.fundingAmount)}</div>` : ''}
+        ${s.opportunityReason ? `
+          <div class="signal-action">
+            <div class="signal-action-label">Opportunité</div>
+            ${esc(s.opportunityReason)}
+          </div>` : ''}
+        ${s.suggestedAction ? `
+          <div class="signal-action" style="margin-top:8px;border-left-color:var(--accent2)">
+            <div class="signal-action-label">Action recommandée</div>
+            ${esc(s.suggestedAction)}
+          </div>` : ''}
+        ${s.url ? `<a href="${s.url}" target="_blank" style="display:block;margin-top:12px;font-size:12px;color:var(--accent)">→ Voir l'article</a>` : ''}
+      </div>
+    `).join('');
+  }
+
+  // ─── SCAN ───────────────────────────────────────────────
+  const scanSteps = [
+    'Connexion à Malt…',
+    'Scraping Freelance.com…',
+    'Analyse Claude AI en cours…',
+    'Calcul des scores de fit…',
+    'Détection signaux marché caché…',
+    'Finalisation…'
+  ];
+
+  async function triggerScan() {
+    const btn = document.getElementById('scanBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Scan…';
+    showOverlay(true);
+
+    let stepIdx = 0;
+    const stepInterval = setInterval(() => {
+      document.getElementById('scanStep').textContent =
+        scanSteps[stepIdx++ % scanSteps.length];
+    }, 3000);
+
+    try {
+      const [mResult, sResult] = await Promise.all([
+        post('/scan/missions'),
+        post('/scan/signals')
+      ]);
+
+      clearInterval(stepInterval);
+      showOverlay(false);
+      await loadAll();
+
+      toast(`✅ ${mResult.newMissions} nouvelles missions · ${sResult.newSignals} signaux`, 'success');
+
+    } catch(e) {
+      clearInterval(stepInterval);
+      showOverlay(false);
+      toast('❌ Erreur lors du scan : ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '⚡ Scanner maintenant';
+    }
+  }
+
+  // ─── STATUS UPDATE ───────────────────────────────────────
+  async function updateStatus(id, status) {
+    try {
+      await fetch(`${API}/missions/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      toast('Statut mis à jour', 'info');
+    } catch(e) {
+      toast('Erreur mise à jour statut', 'error');
+    }
+  }
+
+  // ─── TABS ────────────────────────────────────────────────
+  function showTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-missions').style.display = name === 'missions' ? '' : 'none';
+    document.getElementById('tab-signals').style.display  = name === 'signals'  ? '' : 'none';
+  }
+
+  // ─── HELPERS ─────────────────────────────────────────────
+  async function get(path) {
+    const r = await fetch(API + path);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+
+  async function post(path) {
+    const r = await fetch(API + path, { method: 'POST' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+
+  function esc(s) {
+    if (!s) return '';
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function scoreHtml(score) {
+    if (score == null) return `<div class="score score-none">—</div>`;
+    const cls = score >= 70 ? 'score-high' : score >= 50 ? 'score-mid' : 'score-low';
+    return `<div class="score ${cls}">${score}</div>`;
+  }
+
+  function scoreColor(score) {
+    if (!score) return 'var(--muted)';
+    return score >= 70 ? 'var(--green)' : score >= 50 ? 'var(--orange)' : 'var(--red)';
+  }
+
+  function sourceBadge(source) {
+    const map = {
+      MALT: ['badge-malt','Malt'],
+      FREELANCE_COM: ['badge-freelance','Freelance.com'],
+      LINKEDIN: ['badge-linkedin','LinkedIn'],
+      MANUAL: ['badge-manual','Manuel'],
+    };
+    const [cls, label] = map[source] || ['badge-manual', source];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  function signalBadge(type) {
+    const map = {
+      FUNDING: ['badge-funding','💰 Levée de fonds'],
+      CTO_NOMINATION: ['badge-nomination','👤 Nomination CTO'],
+      TECH_HIRING_SPREE: ['badge-signal','📈 Recrutement massif'],
+      JOB_STILL_OPEN: ['badge-signal','⏳ Poste ouvert'],
+    };
+    const [cls, label] = map[type] || ['badge-signal', type];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  function formatTjm(min, max) {
+    if (!min && !max) return '—';
+    if (min === max || !max) return `${min}€/j`;
+    return `${min}–${max}€/j`;
+  }
+
+  const STATUS_LABELS = {
+    NEW: 'Nouveau',
+    ANALYZED: 'Analysé',
+    SHORTLISTED: 'Shortlisté',
+    CONTACTED: 'Contacté',
+    REPLIED: 'Répondu',
+    IN_DISCUSSION: 'En discussion',
+    ARCHIVED: 'Archivé'
+  };
+
+  function statusOptions(current) {
+    return Object.entries(STATUS_LABELS).map(([val, label]) =>
+      `<option value="${val}" ${val === current ? 'selected' : ''}>${label}</option>`
+    ).join('');
+  }
+
+  function showOverlay(show) {
+    document.getElementById('scanOverlay').classList.toggle('active', show);
+    document.getElementById('scanStep').textContent = scanSteps[0];
+  }
+
+  function toast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast toast-${type}`;
+    el.textContent = msg;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  function setOffline() {
+    document.getElementById('statusDot').style.background = 'var(--red)';
+    document.getElementById('statusDot').style.boxShadow = '0 0 6px var(--red)';
+  }
+</script>
+</body>
+</html>
