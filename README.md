@@ -2,7 +2,7 @@
 
 > AI-powered mission radar for freelance Java Tech Leads — detect opportunities on the visible **and hidden** market, scored and analyzed by Claude AI.
 
-![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=openjdk)
+![Kotlin](https://img.shields.io/badge/Kotlin-1.9-purple?style=flat-square&logo=kotlin)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-green?style=flat-square&logo=springboot)
 ![Angular](https://img.shields.io/badge/Angular-17-red?style=flat-square&logo=angular)
 ![Claude AI](https://img.shields.io/badge/Claude-Sonnet_4.6-blueviolet?style=flat-square)
@@ -29,7 +29,7 @@ As a freelance Java Tech Lead, finding your next mission is painful:
 
 | Feature | Description |
 |---------|-------------|
-| **Multi-source scraping** | Malt, Freelance.com (Playwright + Jsoup) |
+| **Multi-source scraping** | Freelance.com, Hellowork (Jsoup) |
 | **Hidden market signals** | Funding rounds, CTO nominations (Frenchweb, Maddyness) |
 | **Claude AI fit scoring** | 0–100 score per mission based on your profile |
 | **Decision maker detection** | CTO vs HR vs Manager — who to contact |
@@ -37,12 +37,19 @@ As a freelance Java Tech Lead, finding your next mission is painful:
 | **REST API** | Full CRUD + manual scan triggers |
 | **Angular 17 Dashboard** | Dark-themed UI with mission table + signal cards |
 
+### Module 3 — OUTREACH (Implemented)
+
+| Feature | Description |
+|---------|-------------|
+| **Claude-generated messages** | Personalized LinkedIn message + email (subject + body) |
+| **Mission-aware tone** | References fit analysis, decision maker hint, skills |
+| **One-click generation** | `POST /api/radar/missions/{id}/outreach` |
+
 ### Roadmap
 
 | Module | Description | Status |
 |--------|-------------|--------|
 | 2 — QUALIFICATION | Contact scoring, warmth level, LinkedIn profile analysis | Planned |
-| 3 — OUTREACH | Claude-generated personalized messages (LinkedIn + email) | Planned |
 | 4 — PIPELINE | Kanban board (Identified → Contacted → In Discussion → Mission) | Planned |
 | 5 — ANALYTICS | Response rates, TJM market intelligence, profile fitness score | Planned |
 
@@ -52,14 +59,15 @@ As a freelance Java Tech Lead, finding your next mission is painful:
 
 ```
 prospection-radar/
-├── backend/                          # Spring Boot 3.2 — Java 17
-│   └── src/main/java/com/radar/prospection/
-│       ├── scraper/                  # Malt (Playwright), Freelance.com (Jsoup)
+├── backend/                          # Spring Boot 3.2 — Kotlin 1.9 — Gradle
+│   └── src/main/kotlin/com/radar/prospection/
+│       ├── scraper/                  # Freelance.com (API JSON), Hellowork (Jsoup)
 │       ├── signal/                   # Hidden market detectors (Frenchweb, Maddyness)
-│       ├── claude/                   # Claude AI — fit scoring + signal analysis
-│       ├── domain/                   # Mission, Signal, enums
+│       ├── claude/                   # Claude AI — fit scoring, signal analysis, outreach
+│       ├── domain/                   # Mission, Signal, User, enums
 │       ├── repository/               # Spring Data JPA
-│       ├── scheduler/                # Quartz — 3x daily auto-scan
+│       ├── security/                 # JWT auth (jjwt 0.12), SecurityConfig
+│       ├── scheduler/                # Spring @Scheduled — 3x daily auto-scan
 │       └── api/                      # REST controllers + DTOs
 │
 └── frontend/                         # Angular 17 — Standalone components
@@ -68,7 +76,7 @@ prospection-radar/
         ├── layout/topbar/            # Navigation + scan button
         ├── features/
         │   ├── dashboard/            # Stats cards + source bar chart
-        │   ├── missions/             # Sortable table + status dropdown
+        │   ├── missions/             # Sortable table + status dropdown + favorites
         │   └── signals/              # Hidden market signal cards
         └── shared/components/        # ScoreBadge, ToastContainer
 ```
@@ -77,12 +85,13 @@ prospection-radar/
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Spring Boot 3.2, Java 17, Spring Data JPA, Quartz |
-| Scraping | Playwright (JS-rendered pages), Jsoup (static HTML) |
+| Backend | Spring Boot 3.2, **Kotlin 1.9**, Spring Data JPA, Gradle 8.7 |
+| Scraping | Jsoup (static HTML + API JSON) |
 | AI | Claude Sonnet 4.6 via Anthropic API |
+| Auth | JWT (jjwt 0.12), BCrypt, Spring Security stateless |
 | Database | H2 (dev) / PostgreSQL (prod) |
 | Frontend | Angular 17, Standalone components, Signals API |
-| HTTP Proxy | Angular Dev Proxy → Spring Boot :8080 |
+| Deployment | Railway (backend + PostgreSQL), Vercel (frontend) |
 
 ---
 
@@ -92,8 +101,8 @@ prospection-radar/
 
 | Tool | Version |
 |------|---------|
-| Java | 17+ |
-| Maven | 3.8+ |
+| JDK | 17+ |
+| Gradle | 8.7+ (or use the wrapper `./gradlew`) |
 | Node.js | 18+ |
 | Angular CLI | 17+ |
 | Anthropic API Key | [Get one here](https://console.anthropic.com) |
@@ -110,10 +119,11 @@ cd frontend && npm install && cd ..
 
 ### Configuration
 
-Set your Anthropic API key:
+Set your Anthropic API key and JWT secret:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-your-key-here
+export JWT_SECRET=your-secret-at-least-32-chars-long
 ```
 
 Customize your freelance profile in `backend/src/main/resources/application.yml`:
@@ -146,7 +156,7 @@ radar:
 
 ```bash
 cd backend
-mvn spring-boot:run
+./gradlew bootRun
 # Starts on http://localhost:8080
 ```
 
@@ -164,54 +174,74 @@ Open **http://localhost:4200** in your browser.
 
 ## API Reference
 
-Base URL: `http://localhost:8080/api/radar`
+Base URL: `http://localhost:8080`
+
+### Auth
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/register` | Create account `{email, name, password}` → `{token, name, email}` |
+| `POST` | `/api/auth/login` | Login `{email, password}` → `{token, name, email}` |
+| `GET` | `/api/auth/me` | Current user info (requires `Authorization: Bearer <token>`) |
+
+All `/api/radar/**` endpoints require `Authorization: Bearer <token>`.
 
 ### Missions
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/missions` | List missions (`?minScore=70&status=NEW`) |
-| `GET` | `/missions/top` | Missions with fit score ≥ 70 |
-| `PATCH` | `/missions/{id}/status` | Update pipeline status |
-| `POST` | `/scan/missions` | Trigger an immediate scan |
+| `GET` | `/api/radar/missions` | List missions (`?minScore=70` or `?status=NEW`) |
+| `GET` | `/api/radar/missions/top` | Missions with fit score ≥ 70 |
+| `GET` | `/api/radar/missions/favorites` | Favorited missions |
+| `PATCH` | `/api/radar/missions/{id}/status` | Update pipeline status |
+| `PATCH` | `/api/radar/missions/{id}/favorite` | Toggle favorite `{favorite: true}` |
+| `POST` | `/api/radar/missions/{id}/outreach` | Generate personalized LinkedIn + email messages |
+| `POST` | `/api/radar/scan/missions` | Trigger an immediate scrape + Claude analysis |
+| `POST` | `/api/radar/reanalyze` | Re-run Claude on unscored missions |
 
 ### Signals
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/signals` | List signals (`?minScore=60`) |
-| `GET` | `/signals/hot` | Signals with opportunity score ≥ 60 |
-| `POST` | `/scan/signals` | Trigger a signal detection run |
+| `GET` | `/api/radar/signals` | List signals (`?minScore=60`) |
+| `GET` | `/api/radar/signals/hot` | Signals with opportunity score ≥ 60 |
+| `POST` | `/api/radar/scan/signals` | Trigger a signal detection run |
 
 ### Dashboard
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/stats` | Aggregated dashboard stats |
+| `GET` | `/api/radar/stats` | Aggregated dashboard stats (last 7 days) |
 
-### Example — Trigger a full scan
+### Examples
 
 ```bash
-curl -X POST http://localhost:8080/api/radar/scan/missions
+# Trigger a full scan
+curl -X POST http://localhost:8080/api/radar/scan/missions \
+  -H "Authorization: Bearer $TOKEN"
 # → {"newMissions": 12, "duplicates": 3, "analyzed": 12, "errors": []}
 
-curl -X POST http://localhost:8080/api/radar/scan/signals
-# → {"newSignals": 4, "errors": []}
-```
-
-### Example — Get top missions
-
-```bash
-curl http://localhost:8080/api/radar/missions/top | jq '.[0]'
+# Get top missions
+curl http://localhost:8080/api/radar/missions/top \
+  -H "Authorization: Bearer $TOKEN" | jq '.[0]'
 # → {
 #     "id": 1,
-#     "source": "MALT",
+#     "source": "FREELANCE_COM",
 #     "title": "Tech Lead Java / Spring Boot",
 #     "tjmMin": 650, "tjmMax": 750,
 #     "fitScore": 87,
 #     "fitSummary": "Excellent fit — Spring Boot, microservices, remote...",
 #     "decisionMakerHint": "Contact the CTO directly via LinkedIn...",
 #     "status": "NEW"
+#   }
+
+# Generate outreach messages
+curl -X POST http://localhost:8080/api/radar/missions/1/outreach \
+  -H "Authorization: Bearer $TOKEN" | jq
+# → {
+#     "linkedinMessage": "Bonjour, j'ai vu votre mission Tech Lead...",
+#     "emailSubject": "Tech Lead Java — disponible immédiatement",
+#     "emailBody": "Bonjour,\n\nVotre mission m'a retenu l'attention..."
 #   }
 ```
 
@@ -225,9 +255,8 @@ The radar detects signals that indicate a company will need a Tech Lead **before
 |--------|--------|-------------|
 | 💰 Funding round | Frenchweb, Maddyness | Company will hire in 2–3 months |
 | 👤 New CTO/VP Eng | Frenchweb | Reorganization = new tech needs |
-| 📈 3+ dev job offers | LinkedIn, job boards | Project ramp-up = need for TL |
+| 📈 3+ dev job offers | Job boards | Project ramp-up = need for TL |
 | ⏳ Job open 30+ days | Job boards | Difficulty hiring = external TL |
-| 🤝 Former colleague promoted | LinkedIn | Warm contact, existing relationship |
 
 ---
 
@@ -242,6 +271,7 @@ Change status directly from the Angular UI or via API:
 
 ```bash
 curl -X PATCH http://localhost:8080/api/radar/missions/1/status \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"status": "SHORTLISTED"}'
 ```
@@ -278,34 +308,42 @@ ORDER BY opportunity_score DESC;
 
 ## Production Deployment
 
-Switch to PostgreSQL in `application.yml`:
+The app is deployed on:
+- **Backend + PostgreSQL** → [Railway](https://railway.app)
+- **Frontend** → [Vercel](https://vercel.com)
 
-```yaml
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/radar
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-```
-
-Build the Angular app and copy to Spring Boot static resources:
+### Build
 
 ```bash
+# Backend JAR
+cd backend
+./gradlew bootJar
+# → build/libs/prospection-radar-0.1.0-SNAPSHOT.jar
+
+# Frontend production build
 cd frontend
 ng build --configuration production
-cp -r dist/frontend/* ../backend/src/main/resources/static/
 ```
 
-Then only one process to run:
+### Docker (Railway)
 
-```bash
-cd backend && mvn spring-boot:run
-# Full app available on http://localhost:8080
+The `Dockerfile` at the repo root uses a multi-stage build:
+
+```dockerfile
+FROM gradle:8.7-jdk17-alpine AS build
+# ...
+FROM eclipse-temurin:17-jre-alpine
+# Runs: java -Dspring.profiles.active=prod -jar app.jar
 ```
+
+Required environment variables on Railway:
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL JDBC URL |
+| `ANTHROPIC_API_KEY` | Anthropic API key |
+| `JWT_SECRET` | Secret for signing JWT tokens (min 32 chars) |
+| `PORT` | Injected automatically by Railway |
 
 ---
 
@@ -315,8 +353,8 @@ This project is primarily built for personal use by freelance Java Tech Leads. P
 
 - New scrapers (Talent.io, Comet, APEC)
 - New signal detectors (LinkedIn, GitHub activity)
-- Module 3: outreach message generation
 - Module 4: Kanban pipeline
+- Module 5: analytics dashboard
 
 ---
 
