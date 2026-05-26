@@ -1,0 +1,6 @@
+package com.radar.prospection.domain
+
+enum class SignalType {
+    FUNDING, CTO_NOMINATION, TECH_HIRING_SPREE, TECH_BLOG_POST,
+    CONFERENCE_SPEAKER, JOB_STILL_OPEN, FORMER_COLLEAGUE, APPEL_OFFRES
+}
