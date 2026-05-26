@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://VOTRE_APP.railway.app/api/radar'
+  apiUrl: 'https://backend-production-c15b2.up.railway.app/api/radar'
 };
