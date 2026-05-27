@@ -3,7 +3,8 @@
     <div class="spinner lg"></div>
     <span>Chargement…</span>
   </div>
-} @else if (mission(); as m) {
+} @else {
+  @if (mission(); as m) {
 
   <!-- Back -->
   <a class="back-link" routerLink="/missions">
@@ -176,5 +177,6 @@
   <!-- Outreach modal -->
   @if (showOutreach) {
     <app-outreach-modal [mission]="m" (close)="showOutreach = false" />
+  }
   }
 }
