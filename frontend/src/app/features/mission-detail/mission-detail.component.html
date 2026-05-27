@@ -1,0 +1,180 @@
+@if (loading()) {
+  <div class="loading-wrap">
+    <div class="spinner lg"></div>
+    <span>Chargement…</span>
+  </div>
+} @else if (mission(); as m) {
+
+  <!-- Back -->
+  <a class="back-link" routerLink="/missions">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Retour aux missions
+  </a>
+
+  <!-- Header -->
+  <div class="detail-header">
+    <div class="header-left">
+      <app-score-badge [score]="m.fitScore" size="lg" />
+      <div class="header-info">
+        <h1 class="detail-title">{{ m.title }}</h1>
+        <div class="header-meta">
+          @if (m.company) {
+            <span class="meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              {{ m.company }}
+            </span>
+          }
+          @if (m.remote) {
+            <span class="meta-item remote">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+              Full Remote
+            </span>
+          } @else if (m.location) {
+            <span class="meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {{ m.location }}
+            </span>
+          }
+          @if (m.duration) {
+            <span class="meta-item">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              {{ m.duration }}
+            </span>
+          }
+          <span class="meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            {{ formatDate(m.detectedAt) }}
+          </span>
+          <span class="badge" [class]="sourceBadgeClass(m.source)">{{ sourceLabel(m.source) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="tjm-display">{{ formatTjm(m.tjmMin, m.tjmMax) }}</div>
+      <select class="status-select" [class]="'status-sel ' + statusColors[m.status]"
+        [ngModel]="m.status" (ngModelChange)="updateStatus($event)">
+        @for (s of statuses; track s) {
+          <option [value]="s">{{ statusLabels[s] }}</option>
+        }
+      </select>
+      <button class="btn-icon" [class.active]="m.favorite" title="{{ m.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}" (click)="toggleFavorite()">
+        <svg width="15" height="15" viewBox="0 0 24 24" [attr.fill]="m.favorite ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </button>
+      @if (m.url) {
+        <a [href]="m.url" target="_blank" rel="noopener" class="btn-outline">
+          Voir l'offre
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+      }
+      <button class="btn-primary" (click)="showOutreach = true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Générer message
+      </button>
+    </div>
+  </div>
+
+  <!-- Skills -->
+  @if (m.skills && m.skills.length > 0) {
+    <div class="skills-row">
+      @for (skill of m.skills; track skill) {
+        <span class="skill-tag">{{ skill }}</span>
+      }
+    </div>
+  }
+
+  <!-- Body grid -->
+  <div class="detail-body">
+
+    <!-- Left column -->
+    <div class="detail-main">
+
+      @if (m.fitSummary) {
+        <div class="section-card ai-card">
+          <div class="section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Analyse fit Claude AI
+            @if (m.fitScore) {
+              <span class="score-chip" [class]="m.fitScore >= 70 ? 'chip-green' : m.fitScore >= 50 ? 'chip-amber' : 'chip-red'">{{ m.fitScore }}/100</span>
+            }
+          </div>
+          <p class="section-text">{{ m.fitSummary }}</p>
+        </div>
+      }
+
+      @if (m.decisionMakerHint) {
+        <div class="section-card contact-card">
+          <div class="section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Stratégie de contact
+          </div>
+          <p class="section-text">{{ m.decisionMakerHint }}</p>
+        </div>
+      }
+
+      @if (m.description) {
+        <div class="section-card">
+          <div class="section-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Description de la mission
+          </div>
+          <p class="section-text description">{{ m.description }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- Right column -->
+    <div class="detail-aside">
+      <div class="aside-card">
+        <div class="aside-title">Infos mission</div>
+        <dl class="info-list">
+          <div class="info-row">
+            <dt>Source</dt>
+            <dd><span class="badge sm" [class]="sourceBadgeClass(m.source)">{{ sourceLabel(m.source) }}</span></dd>
+          </div>
+          @if (m.company) {
+            <div class="info-row">
+              <dt>Entreprise</dt>
+              <dd>{{ m.company }}</dd>
+            </div>
+          }
+          <div class="info-row">
+            <dt>TJM</dt>
+            <dd>{{ formatTjm(m.tjmMin, m.tjmMax) }}</dd>
+          </div>
+          @if (m.duration) {
+            <div class="info-row">
+              <dt>Durée</dt>
+              <dd>{{ m.duration }}</dd>
+            </div>
+          }
+          <div class="info-row">
+            <dt>Télétravail</dt>
+            <dd>{{ m.remote ? 'Oui' : 'Non / Hybride' }}</dd>
+          </div>
+          @if (m.location) {
+            <div class="info-row">
+              <dt>Localisation</dt>
+              <dd>{{ m.location }}</dd>
+            </div>
+          }
+          <div class="info-row">
+            <dt>Détectée le</dt>
+            <dd>{{ formatDate(m.detectedAt) }}</dd>
+          </div>
+          <div class="info-row">
+            <dt>Statut</dt>
+            <dd>{{ statusLabels[m.status] }}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <!-- Outreach modal -->
+  @if (showOutreach) {
+    <app-outreach-modal [mission]="m" (close)="showOutreach = false" />
+  }
+}

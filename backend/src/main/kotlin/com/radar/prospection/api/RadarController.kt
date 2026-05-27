@@ -36,6 +36,12 @@ class RadarController(
         return missions.map { MissionDto.from(it) }
     }
 
+    @GetMapping("/missions/{id}")
+    fun getMission(@PathVariable id: Long): ResponseEntity<MissionDto> =
+        missionRepository.findById(id)
+            .map { ResponseEntity.ok(MissionDto.from(it)) }
+            .orElse(ResponseEntity.notFound().build())
+
     @GetMapping("/missions/top")
     fun getTopMissions(): List<MissionDto> =
         missionRepository.findByFitScoreGreaterThanEqualOrderByFitScoreDesc(70).map { MissionDto.from(it) }

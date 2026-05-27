@@ -1,10 +1,15 @@
 target/
 data/
-*.jar
 *.class
 .env
 application-local.yml
 *.log
+
+# Gradle
+backend/.gradle/
+backend/build/
+# Keep the wrapper JAR
+!backend/gradle/wrapper/gradle-wrapper.jar
 
 # IDE
 .idea/

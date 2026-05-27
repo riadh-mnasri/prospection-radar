@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { RadarService } from '../../core/services/radar.service';
 import { ToastService } from '../../core/services/toast.service';
 import { Mission, MissionStatus } from '../../core/models/mission.model';
@@ -9,7 +10,7 @@ import { OutreachModalComponent } from '../../shared/components/outreach-modal/o
 @Component({
   selector: 'app-missions',
   standalone: true,
-  imports: [FormsModule, ScoreBadgeComponent, OutreachModalComponent],
+  imports: [FormsModule, RouterLink, ScoreBadgeComponent, OutreachModalComponent],
   templateUrl: './missions.component.html',
   styleUrl: './missions.component.scss'
 })

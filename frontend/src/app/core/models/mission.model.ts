@@ -14,6 +14,7 @@ export interface Mission {
   tjmMin?: number;
   tjmMax?: number;
   duration?: string;
+  description?: string;
   skills?: string[];
   url?: string;
   status: MissionStatus;
