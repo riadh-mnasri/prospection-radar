@@ -1,0 +1,84 @@
+<div class="modal-backdrop" (click)="onBackdrop($event)">
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+        Importer une mission
+      </div>
+      <button class="close-btn" (click)="close.emit()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-hint">Colle ici une mission reçue par email, LinkedIn ou réseau. Claude l'analysera et calculera le score fit automatiquement.</p>
+
+      <div class="form-row">
+        <label class="form-label">Titre <span class="required">*</span></label>
+        <input class="form-input" [(ngModel)]="title" placeholder="Tech Lead Java / Spring Boot — Fintech Paris" />
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" [(ngModel)]="description" rows="5"
+          placeholder="Colle la description complète de la mission ici — plus c'est détaillé, meilleur sera l'analyse…"></textarea>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-row">
+          <label class="form-label">Entreprise</label>
+          <input class="form-input" [(ngModel)]="company" placeholder="FinTech XYZ" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Localisation</label>
+          <input class="form-input" [(ngModel)]="location" placeholder="Paris, Lyon…" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">TJM min (€/j)</label>
+          <input class="form-input" type="number" [(ngModel)]="tjmMin" placeholder="650" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">TJM max (€/j)</label>
+          <input class="form-input" type="number" [(ngModel)]="tjmMax" placeholder="800" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Durée</label>
+          <input class="form-input" [(ngModel)]="duration" placeholder="6 mois" />
+        </div>
+        <div class="form-row remote-row">
+          <label class="form-label">Télétravail</label>
+          <label class="toggle">
+            <input type="checkbox" [(ngModel)]="remote" />
+            <span class="toggle-slider"></span>
+            <span class="toggle-label">{{ remote ? 'Oui' : 'Non / Hybride' }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Compétences <span class="hint">(séparées par des virgules)</span></label>
+        <input class="form-input" [(ngModel)]="skillsRaw" placeholder="Java, Spring Boot, Microservices, AWS" />
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">URL de l'offre</label>
+        <input class="form-input" [(ngModel)]="url" placeholder="https://…" />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="close.emit()">Annuler</button>
+      <button class="btn-submit" [disabled]="!title.trim() || loading()" (click)="submit()">
+        @if (loading()) {
+          <div class="spinner sm"></div>
+          Analyse en cours…
+        } @else {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Analyser avec Claude
+        }
+      </button>
+    </div>
+
+  </div>
+</div>

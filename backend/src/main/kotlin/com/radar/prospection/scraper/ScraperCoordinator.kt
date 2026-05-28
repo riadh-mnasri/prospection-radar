@@ -2,6 +2,7 @@ package com.radar.prospection.scraper
 
 import com.radar.prospection.claude.MissionAnalysisService
 import com.radar.prospection.config.RadarProperties
+import com.radar.prospection.notification.NotificationService
 import com.radar.prospection.repository.MissionRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -11,7 +12,8 @@ class ScraperCoordinator(
     private val scrapers: List<MissionScraper>,
     private val missionRepository: MissionRepository,
     private val analysisService: MissionAnalysisService,
-    private val properties: RadarProperties
+    private val properties: RadarProperties,
+    private val notificationService: NotificationService? = null
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -37,7 +39,8 @@ class ScraperCoordinator(
                             continue
                         }
                         val analyzed = analysisService.analyze(mission)
-                        missionRepository.save(analyzed)
+                        val saved = missionRepository.save(analyzed)
+                        notificationService?.notifyHighScoreMission(saved)
                         newCount++
                         analyzedCount++
                     } catch (e: Exception) {

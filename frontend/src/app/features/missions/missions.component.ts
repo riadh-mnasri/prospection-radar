@@ -1,25 +1,49 @@
-import { Component, OnInit, OnDestroy, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { RadarService } from '../../core/services/radar.service';
 import { ToastService } from '../../core/services/toast.service';
-import { Mission, MissionStatus } from '../../core/models/mission.model';
+import { Mission, MissionStatus, Source } from '../../core/models/mission.model';
 import { ScoreBadgeComponent } from '../../shared/components/score-badge/score-badge.component';
 import { OutreachModalComponent } from '../../shared/components/outreach-modal/outreach-modal.component';
+import { ImportMissionModalComponent } from '../../shared/components/import-mission-modal/import-mission-modal.component';
 
 @Component({
   selector: 'app-missions',
   standalone: true,
-  imports: [FormsModule, RouterLink, ScoreBadgeComponent, OutreachModalComponent],
+  imports: [FormsModule, RouterLink, ScoreBadgeComponent, OutreachModalComponent, ImportMissionModalComponent],
   templateUrl: './missions.component.html',
   styleUrl: './missions.component.scss'
 })
 export class MissionsComponent implements OnInit, OnDestroy {
-  missions   = signal<Mission[]>([]);
-  loading    = signal(true);
-  minScore   = 0;
+  allMissions = signal<Mission[]>([]);
+  loading      = signal(true);
   expandedId: number | null = null;
   outreachMission: Mission | null = null;
+  showImport = false;
+
+  // Filtres
+  search    = '';
+  minScore  = 0;
+  filterSource  = '';
+  filterStatus  = '';
+  filterRemote  = false;
+
+  missions = computed(() => {
+    let list = this.allMissions();
+    const q = this.search.toLowerCase().trim();
+    if (q) list = list.filter(m =>
+      m.title?.toLowerCase().includes(q) ||
+      m.company?.toLowerCase().includes(q) ||
+      m.skills?.some(s => s.toLowerCase().includes(q))
+    );
+    if (this.minScore > 0)      list = list.filter(m => (m.fitScore ?? 0) >= this.minScore);
+    if (this.filterSource)      list = list.filter(m => m.source === this.filterSource);
+    if (this.filterStatus)      list = list.filter(m => m.status === this.filterStatus);
+    if (this.filterRemote)      list = list.filter(m => m.remote === true);
+    return list;
+  });
+
   private refreshListener = () => this.load();
 
   readonly statusLabels: Record<MissionStatus, string> = {
@@ -36,6 +60,11 @@ export class MissionsComponent implements OnInit, OnDestroy {
 
   readonly statuses = Object.keys(this.statusLabels) as MissionStatus[];
 
+  readonly sourceLabels: Record<string, string> = {
+    MALT: 'Hellowork', FREELANCE_COM: 'Free-Work',
+    LINKEDIN: 'LinkedIn', TALENT_IO: 'Talent.io', MANUAL: 'Manuel'
+  };
+
   constructor(private radar: RadarService, private toast: ToastService) {}
 
   ngOnInit() {
@@ -49,15 +78,22 @@ export class MissionsComponent implements OnInit, OnDestroy {
 
   load() {
     this.loading.set(true);
-    this.radar.getMissions(this.minScore).subscribe({
-      next: m  => { this.missions.set(m); this.loading.set(false); },
+    this.radar.getMissions().subscribe({
+      next: m  => { this.allMissions.set(m); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
   }
 
-  toggle(id: number) {
-    this.expandedId = this.expandedId === id ? null : id;
+  resetFilters() {
+    this.search = ''; this.minScore = 0;
+    this.filterSource = ''; this.filterStatus = ''; this.filterRemote = false;
   }
+
+  get hasActiveFilters(): boolean {
+    return !!(this.search || this.minScore > 0 || this.filterSource || this.filterStatus || this.filterRemote);
+  }
+
+  toggle(id: number) { this.expandedId = this.expandedId === id ? null : id; }
 
   isNew(detectedAt: string): boolean {
     return Date.now() - new Date(detectedAt).getTime() < 24 * 60 * 60 * 1000;
@@ -71,7 +107,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
   toggleFavorite(mission: Mission, event: MouseEvent) {
     event.stopPropagation();
     this.radar.toggleFavorite(mission.id, !mission.favorite).subscribe({
-      next: updated => this.missions.update(list => list.map(m => m.id === updated.id ? updated : m)),
+      next: updated => this.allMissions.update(list => list.map(m => m.id === updated.id ? updated : m)),
       error: () => this.toast.show('Erreur', 'error')
     });
   }
@@ -80,7 +116,7 @@ export class MissionsComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.radar.updateMissionStatus(mission.id, 'ARCHIVED').subscribe({
       next: updated => {
-        this.missions.update(list => list.map(m => m.id === updated.id ? updated : m));
+        this.allMissions.update(list => list.map(m => m.id === updated.id ? updated : m));
         this.toast.show('Mission archivée', 'success');
       },
       error: () => this.toast.show('Erreur', 'error')
@@ -90,11 +126,16 @@ export class MissionsComponent implements OnInit, OnDestroy {
   updateStatus(mission: Mission, status: MissionStatus) {
     this.radar.updateMissionStatus(mission.id, status).subscribe({
       next: updated => {
-        this.missions.update(list => list.map(m => m.id === updated.id ? updated : m));
+        this.allMissions.update(list => list.map(m => m.id === updated.id ? updated : m));
         this.toast.show('Statut mis à jour', 'success');
       },
       error: () => this.toast.show('Erreur mise à jour', 'error')
     });
+  }
+
+  onImportClose() {
+    this.showImport = false;
+    this.load();
   }
 
   formatTjm(min?: number, max?: number): string {
@@ -112,10 +153,6 @@ export class MissionsComponent implements OnInit, OnDestroy {
   }
 
   sourceLabel(source: string): string {
-    const map: Record<string, string> = {
-      MALT: 'Hellowork', FREELANCE_COM: 'Free-Work',
-      LINKEDIN: 'LinkedIn', TALENT_IO: 'Talent.io', MANUAL: 'Manuel'
-    };
-    return map[source] ?? source;
+    return this.sourceLabels[source] ?? source;
   }
 }

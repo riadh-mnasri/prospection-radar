@@ -2,8 +2,11 @@ package com.radar.prospection.api
 
 import com.radar.prospection.claude.MissionAnalysisService
 import com.radar.prospection.claude.OutreachService
+import com.radar.prospection.domain.Mission
 import com.radar.prospection.domain.MissionStatus
 import com.radar.prospection.domain.SignalStatus
+import com.radar.prospection.domain.Source
+import com.radar.prospection.notification.NotificationService
 import com.radar.prospection.repository.MissionRepository
 import com.radar.prospection.repository.SignalRepository
 import com.radar.prospection.scraper.ScraperCoordinator
@@ -20,7 +23,8 @@ class RadarController(
     private val scraperCoordinator: ScraperCoordinator,
     private val signalCoordinator: SignalCoordinator,
     private val analysisService: MissionAnalysisService,
-    private val outreachService: OutreachService
+    private val outreachService: OutreachService,
+    private val notificationService: NotificationService? = null
 ) {
 
     @GetMapping("/missions")
@@ -75,6 +79,29 @@ class RadarController(
             "analyzed" to result.analyzed,
             "errors" to result.errors
         ))
+    }
+
+    @PostMapping("/missions/import")
+    fun importMission(@RequestBody req: MissionImportRequest): ResponseEntity<MissionDto> {
+        val mission = Mission(
+            source = Source.MANUAL,
+            externalId = "manual-${System.currentTimeMillis()}",
+            title = req.title,
+            description = req.description,
+            company = req.company,
+            location = req.location,
+            remote = req.remote,
+            tjmMin = req.tjmMin,
+            tjmMax = req.tjmMax,
+            duration = req.duration,
+            skills = req.skills.toMutableList(),
+            url = req.url,
+            detectedAt = LocalDateTime.now()
+        )
+        val analyzed = analysisService.analyze(mission)
+        val saved = missionRepository.save(analyzed)
+        notificationService?.notifyHighScoreMission(saved)
+        return ResponseEntity.ok(MissionDto.from(saved))
     }
 
     @PostMapping("/reanalyze")

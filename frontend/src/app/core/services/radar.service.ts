@@ -20,6 +20,10 @@ export class RadarService {
     return this.http.get<Mission>(`${this.api}/missions/${id}`);
   }
 
+  importMission(req: Partial<Mission> & { title: string }): Observable<Mission> {
+    return this.http.post<Mission>(`${this.api}/missions/import`, req);
+  }
+
   getMissions(minScore = 0, status?: MissionStatus): Observable<Mission[]> {
     let params = new HttpParams().set('minScore', minScore);
     if (status) params = params.set('status', status);

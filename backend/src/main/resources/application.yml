@@ -69,6 +69,24 @@ security:
     secret: ${JWT_SECRET:RadarSecretKey2026WeHighTechRiadhMnasriSuperSecretKey}
     expiration-ms: 86400000  # 24h
 
+notification:
+  email:
+    enabled: ${MAIL_ENABLED:false}
+    to: ${NOTIFICATION_EMAIL:riadh.mnasri@gmail.com}
+    from: ${MAIL_USERNAME:riadh.mnasri@gmail.com}
+    score-threshold: 80
+    app-url: ${APP_URL:http://localhost:4200}
+
+spring:
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
 logging:
   level:
     com.radar: DEBUG
