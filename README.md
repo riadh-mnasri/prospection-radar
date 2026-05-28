@@ -2,6 +2,7 @@
 
 > AI-powered mission radar for freelance Java Tech Leads — detect opportunities on the visible **and hidden** market, scored and analyzed by Claude AI.
 
+![CI](https://github.com/riadh-mnasri/prospection-radar/actions/workflows/ci.yml/badge.svg)
 ![Kotlin](https://img.shields.io/badge/Kotlin-1.9-purple?style=flat-square&logo=kotlin)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-green?style=flat-square&logo=springboot)
 ![Angular](https://img.shields.io/badge/Angular-17-red?style=flat-square&logo=angular)
